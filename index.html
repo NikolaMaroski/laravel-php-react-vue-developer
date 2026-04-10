@@ -42,8 +42,9 @@ strong{color:var(--text)}
 .sidebar a:hover,.sidebar a.active{color:var(--text);background:var(--surface2);border-left-color:var(--accent);text-decoration:none}
 .sidebar a .tech-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
 .main{margin-left:280px;margin-top:56px;padding:2rem 2.5rem 4rem;max-width:960px}
-section{display:none;animation:fadeIn .4s ease}
-section.active{display:block}
+section{animation:fadeIn .4s ease;padding-bottom:2rem;margin-bottom:2rem;border-bottom:1px solid var(--surface3)}
+section:last-child{border-bottom:none}
+.progress-bar-top{position:fixed;top:56px;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--green),var(--cyan));z-index:101;width:0;transition:width .2s}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 /* COMPONENTS */
 .card{background:var(--surface);border:1px solid var(--surface3);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
@@ -151,6 +152,9 @@ tr:hover td{background:var(--surface2)}
   <span class="badge">Interview.io Style</span>
 </div>
 
+<!-- PROGRESS BAR -->
+<div class="progress-bar-top" id="progressBar"></div>
+
 <!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
   <div class="group-title">Getting Started</div>
@@ -195,7 +199,7 @@ tr:hover td{background:var(--surface2)}
 <div class="main">
 
 <!-- ==================== OVERVIEW ==================== -->
-<section id="overview" class="active">
+<section id="overview">
   <h2>Interview.io Technical Interview - Senior Dev Prep</h2>
   <p>Interview.io has a <strong>1.2% acceptance rate</strong>. This app covers every topic they test for <strong>PHP + Laravel + React + Vue</strong> at the senior level. The process is tough but predictable - here's exactly what to expect.</p>
 
@@ -3862,27 +3866,66 @@ class ApiRateLimiter
 </div><!-- /main -->
 
 <script>
-// NAVIGATION
+// NAVIGATION - click to scroll
 document.querySelectorAll('.sidebar a').forEach(link => {
   link.addEventListener('click', (e) => {
     e.preventDefault();
     const target = link.dataset.section;
+    const section = document.getElementById(target);
 
     // Update active nav
     document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
     link.classList.add('active');
 
-    // Show section
-    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-    document.getElementById(target).classList.add('active');
-
     // Close mobile menu
     document.querySelector('.sidebar').classList.remove('open');
 
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to section
+    const topOffset = 56 + 16; // topbar height + padding
+    const y = section.getBoundingClientRect().top + window.pageYOffset - topOffset;
+    isScrolling = true;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+    // Prevent scroll spy from overriding during programmatic scroll
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => { isScrolling = false; }, 1000);
   });
 });
+
+// PROGRESS BAR
+window.addEventListener('scroll', () => {
+  const scrollTop = document.documentElement.scrollTop;
+  const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const progress = (scrollTop / scrollHeight) * 100;
+  document.getElementById('progressBar').style.width = progress + '%';
+});
+
+// SCROLL SPY - highlight nav on scroll
+let isScrolling = false;
+let scrollTimer = null;
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('.sidebar a[data-section]');
+const navMap = {};
+navLinks.forEach(link => { navMap[link.dataset.section] = link; });
+
+const observer = new IntersectionObserver((entries) => {
+  if (isScrolling) return;
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(a => a.classList.remove('active'));
+      const link = navMap[entry.target.id];
+      if (link) {
+        link.classList.add('active');
+        // Scroll nav link into view in sidebar
+        link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+  });
+}, {
+  rootMargin: '-80px 0px -60% 0px',
+  threshold: 0
+});
+
+sections.forEach(section => observer.observe(section));
 
 // ACCORDION
 document.querySelectorAll('.accordion-btn').forEach(btn => {
