@@ -1,0 +1,4019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Senior Dev Interview Prep - PHP/Laravel + React + Vue | Lemon.io Style</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#232736;--surface3:#2c3040;
+  --text:#e4e6ef;--text2:#9ca0b0;--accent:#6c63ff;--accent2:#8b83ff;
+  --green:#22c55e;--green2:#16a34a;--red:#ef4444;--orange:#f59e0b;--cyan:#06b6d4;
+  --php:#777bb4;--laravel:#ff2d20;--react:#61dafb;--vue:#42b883;
+  --radius:10px;--shadow:0 4px 24px rgba(0,0,0,.3);
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:'SF Mono','Fira Code','Cascadia Code',monospace;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{font-weight:700;line-height:1.3}
+h1{font-size:2rem}
+h2{font-size:1.6rem;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid var(--surface3)}
+h3{font-size:1.25rem;margin:1.5rem 0 .75rem;color:var(--accent2)}
+h4{font-size:1.1rem;margin:1rem 0 .5rem}
+p{margin-bottom:.75rem}
+ul,ol{margin:0 0 1rem 1.5rem}
+li{margin-bottom:.35rem}
+code{font-family:var(--mono);background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:.9em}
+pre{background:var(--surface);border:1px solid var(--surface3);border-radius:var(--radius);padding:1rem;overflow-x:auto;margin:1rem 0;font-family:var(--mono);font-size:.85rem;line-height:1.6}
+pre code{background:none;padding:0}
+strong{color:var(--text)}
+/* LAYOUT */
+.topbar{position:fixed;top:0;left:0;right:0;height:56px;background:var(--surface);border-bottom:1px solid var(--surface3);display:flex;align-items:center;padding:0 1rem;z-index:100;gap:.75rem}
+.topbar h1{font-size:1.1rem;white-space:nowrap}
+.topbar .badge{font-size:.65rem;background:var(--accent);color:#fff;padding:2px 8px;border-radius:99px;font-weight:600;text-transform:uppercase}
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer;padding:4px}
+.sidebar{position:fixed;top:56px;left:0;bottom:0;width:280px;background:var(--surface);border-right:1px solid var(--surface3);overflow-y:auto;padding:1rem 0;z-index:90;transition:transform .3s}
+.sidebar .group-title{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);padding:.75rem 1.25rem .35rem;font-weight:700}
+.sidebar a{display:block;padding:.45rem 1.25rem;color:var(--text2);font-size:.88rem;border-left:3px solid transparent;transition:all .15s}
+.sidebar a:hover,.sidebar a.active{color:var(--text);background:var(--surface2);border-left-color:var(--accent);text-decoration:none}
+.sidebar a .tech-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.main{margin-left:280px;margin-top:56px;padding:2rem 2.5rem 4rem;max-width:960px}
+section{display:none;animation:fadeIn .4s ease}
+section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* COMPONENTS */
+.card{background:var(--surface);border:1px solid var(--surface3);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin:1rem 0}
+.stat-card{text-align:center;padding:1.5rem}
+.stat-card .num{font-size:2.5rem;font-weight:800;color:var(--accent)}
+.stat-card .label{color:var(--text2);font-size:.85rem;margin-top:.25rem}
+.tag{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.75rem;font-weight:600;margin:2px}
+.tag-php{background:rgba(119,123,180,.2);color:var(--php)}
+.tag-laravel{background:rgba(255,45,32,.15);color:var(--laravel)}
+.tag-react{background:rgba(97,218,251,.15);color:var(--react)}
+.tag-vue{background:rgba(66,184,131,.15);color:var(--vue)}
+.tag-senior{background:rgba(108,99,255,.2);color:var(--accent2)}
+.progress-bar{height:6px;background:var(--surface3);border-radius:99px;margin:1rem 0;overflow:hidden}
+.progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;transition:width .5s ease}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--surface3);margin-bottom:1.5rem;overflow-x:auto}
+.tabs button{background:none;border:none;color:var(--text2);padding:.6rem 1.2rem;cursor:pointer;font-size:.9rem;font-family:var(--font);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s}
+.tabs button:hover{color:var(--text)}
+.tabs button.active{color:var(--accent2);border-bottom-color:var(--accent)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.accordion{margin:1rem 0}
+.accordion-item{border:1px solid var(--surface3);border-radius:var(--radius);margin-bottom:.5rem;overflow:hidden}
+.accordion-btn{width:100%;background:var(--surface);border:none;color:var(--text);padding:.85rem 1.1rem;text-align:left;cursor:pointer;font-size:.95rem;font-family:var(--font);display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+.accordion-btn:hover{background:var(--surface2)}
+.accordion-btn::after{content:'+';font-size:1.2rem;color:var(--text2);transition:transform .2s}
+.accordion-item.open .accordion-btn::after{content:'-'}
+.accordion-body{display:none;padding:1rem 1.1rem;background:var(--surface2);border-top:1px solid var(--surface3)}
+.accordion-item.open .accordion-body{display:block}
+/* QUIZ */
+.quiz-container{margin:1rem 0}
+.quiz-q{background:var(--surface);border:1px solid var(--surface3);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.quiz-q h4{margin:0 0 .75rem}
+.quiz-q label{display:block;padding:.4rem .6rem;border-radius:6px;cursor:pointer;transition:background .15s;font-size:.93rem}
+.quiz-q label:hover{background:var(--surface2)}
+.quiz-q input[type=radio]{margin-right:.5rem;accent-color:var(--accent)}
+.quiz-result{padding:1rem;border-radius:var(--radius);margin-top:1rem;font-weight:600;text-align:center;font-size:1.1rem}
+.quiz-result.pass{background:rgba(34,197,94,.15);color:var(--green)}
+.quiz-result.fail{background:rgba(239,68,68,.15);color:var(--red)}
+.quiz-explanation{margin-top:.5rem;padding:.75rem;background:var(--surface2);border-radius:6px;font-size:.88rem;display:none}
+.quiz-q.answered .quiz-explanation{display:block}
+.quiz-q.correct{border-color:var(--green)}
+.quiz-q.wrong{border-color:var(--red)}
+/* CODING CHALLENGE */
+.challenge{background:var(--surface);border:1px solid var(--surface3);border-radius:var(--radius);padding:1.5rem;margin:1rem 0}
+.challenge textarea{width:100%;min-height:200px;background:var(--bg);color:var(--green);border:1px solid var(--surface3);border-radius:6px;padding:1rem;font-family:var(--mono);font-size:.88rem;resize:vertical;line-height:1.5;tab-size:4}
+.challenge textarea:focus{outline:none;border-color:var(--accent)}
+.btn{display:inline-block;padding:.55rem 1.25rem;border-radius:6px;font-size:.9rem;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-green{background:var(--green2);color:#fff}
+.btn-green:hover{background:var(--green)}
+.btn-outline{background:transparent;border:1px solid var(--surface3);color:var(--text2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--text)}
+.challenge-feedback{margin-top:.75rem;padding:.75rem;border-radius:6px;font-size:.9rem;display:none}
+.challenge-feedback.show{display:block}
+.timer{font-family:var(--mono);font-size:1.1rem;color:var(--orange);font-weight:700}
+/* INTERVIEW Q&A */
+.qa-item{border-left:3px solid var(--accent);padding-left:1rem;margin:1.5rem 0}
+.qa-item .question{font-weight:700;font-size:1.05rem;margin-bottom:.5rem;color:var(--accent2)}
+.qa-item .answer{color:var(--text2);display:none}
+.qa-item.revealed .answer{display:block}
+.qa-item .reveal-btn{font-size:.85rem;color:var(--accent);cursor:pointer;border:none;background:none;font-family:var(--font);padding:0;margin-top:.25rem}
+.qa-item .reveal-btn:hover{text-decoration:underline}
+/* STAGE INDICATOR */
+.stages{display:flex;gap:0;margin:1.5rem 0;flex-wrap:wrap}
+.stage{flex:1;min-width:140px;padding:1rem;text-align:center;position:relative;background:var(--surface)}
+.stage:first-child{border-radius:var(--radius) 0 0 var(--radius)}
+.stage:last-child{border-radius:0 var(--radius) var(--radius) 0}
+.stage .stage-num{font-size:1.8rem;font-weight:800;color:var(--accent)}
+.stage .stage-title{font-size:.8rem;font-weight:700;margin-top:.25rem}
+.stage .stage-desc{font-size:.72rem;color:var(--text2);margin-top:.25rem}
+.stage+.stage{border-left:1px solid var(--surface3)}
+/* COMPARISON TABLE */
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.9rem}
+th,td{padding:.6rem .8rem;text-align:left;border:1px solid var(--surface3)}
+th{background:var(--surface2);font-weight:700;color:var(--accent2)}
+td{background:var(--surface)}
+tr:hover td{background:var(--surface2)}
+/* MOBILE */
+@media(max-width:900px){
+  .hamburger{display:block}
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:1.5rem 1rem 3rem}
+  .stages{flex-direction:column}
+  .stage:first-child,.stage:last-child{border-radius:var(--radius)}
+  .stage+.stage{border-left:none;border-top:1px solid var(--surface3)}
+}
+.highlight-box{padding:1rem 1.25rem;border-radius:var(--radius);margin:1rem 0}
+.highlight-box.info{background:rgba(6,182,212,.1);border-left:4px solid var(--cyan)}
+.highlight-box.warning{background:rgba(245,158,11,.1);border-left:4px solid var(--orange)}
+.highlight-box.success{background:rgba(34,197,94,.1);border-left:4px solid var(--green)}
+.highlight-box.danger{background:rgba(239,68,68,.1);border-left:4px solid var(--red)}
+.checklist{list-style:none;margin-left:0}
+.checklist li{padding:.35rem 0;padding-left:1.5rem;position:relative}
+.checklist li::before{content:'>';position:absolute;left:0;color:var(--green);font-weight:700}
+</style>
+</head>
+<body>
+<!-- TOP BAR -->
+<div class="topbar">
+  <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle menu">&#9776;</button>
+  <h1>Senior Dev Interview Prep</h1>
+  <span class="badge">Lemon.io Style</span>
+</div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="group-title">Getting Started</div>
+  <a href="#" data-section="overview" class="active"><span class="tech-dot" style="background:var(--accent)"></span>Overview & Process</a>
+  <a href="#" data-section="scoring"><span class="tech-dot" style="background:var(--orange)"></span>Scoring & What They Want</a>
+
+  <div class="group-title">PHP 8 Core</div>
+  <a href="#" data-section="php-core"><span class="tech-dot" style="background:var(--php)"></span>PHP 8 Deep Dive</a>
+  <a href="#" data-section="php-oop"><span class="tech-dot" style="background:var(--php)"></span>OOP & Design Patterns</a>
+  <a href="#" data-section="php-security"><span class="tech-dot" style="background:var(--php)"></span>Security & Performance</a>
+
+  <div class="group-title">Laravel</div>
+  <a href="#" data-section="laravel-core"><span class="tech-dot" style="background:var(--laravel)"></span>Service Container & Providers</a>
+  <a href="#" data-section="laravel-eloquent"><span class="tech-dot" style="background:var(--laravel)"></span>Eloquent & Database</a>
+  <a href="#" data-section="laravel-advanced"><span class="tech-dot" style="background:var(--laravel)"></span>Queues, Events & Jobs</a>
+  <a href="#" data-section="laravel-auth"><span class="tech-dot" style="background:var(--laravel)"></span>Auth, Policies & Gates</a>
+  <a href="#" data-section="laravel-architecture"><span class="tech-dot" style="background:var(--laravel)"></span>Architecture & Patterns</a>
+
+  <div class="group-title">React</div>
+  <a href="#" data-section="react-core"><span class="tech-dot" style="background:var(--react)"></span>Hooks & State</a>
+  <a href="#" data-section="react-advanced"><span class="tech-dot" style="background:var(--react)"></span>Advanced Patterns</a>
+  <a href="#" data-section="react-perf"><span class="tech-dot" style="background:var(--react)"></span>Performance & Architecture</a>
+
+  <div class="group-title">Vue</div>
+  <a href="#" data-section="vue-core"><span class="tech-dot" style="background:var(--vue)"></span>Composition API & Reactivity</a>
+  <a href="#" data-section="vue-advanced"><span class="tech-dot" style="background:var(--vue)"></span>Pinia, Router & SSR</a>
+
+  <div class="group-title">System Design & DevOps</div>
+  <a href="#" data-section="system-design"><span class="tech-dot" style="background:var(--cyan)"></span>System Design</a>
+  <a href="#" data-section="devops"><span class="tech-dot" style="background:var(--cyan)"></span>DevOps & CI/CD</a>
+
+  <div class="group-title">Practice</div>
+  <a href="#" data-section="quiz-php"><span class="tech-dot" style="background:var(--php)"></span>PHP & Laravel Quiz</a>
+  <a href="#" data-section="quiz-react"><span class="tech-dot" style="background:var(--react)"></span>React Quiz</a>
+  <a href="#" data-section="quiz-vue"><span class="tech-dot" style="background:var(--vue)"></span>Vue Quiz</a>
+  <a href="#" data-section="challenges"><span class="tech-dot" style="background:var(--orange)"></span>Coding Challenges</a>
+  <a href="#" data-section="mock-interview"><span class="tech-dot" style="background:var(--accent)"></span>Mock Interview Q&A</a>
+  <a href="#" data-section="resources"><span class="tech-dot" style="background:var(--green)"></span>Resources & Tips</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- ==================== OVERVIEW ==================== -->
+<section id="overview" class="active">
+  <h2>Lemon.io Technical Interview - Senior Dev Prep</h2>
+  <p>Lemon.io has a <strong>1.2% acceptance rate</strong>. This app covers every topic they test for <strong>PHP + Laravel + React + Vue</strong> at the senior level. The process is tough but predictable - here's exactly what to expect.</p>
+
+  <div class="stages">
+    <div class="stage"><div class="stage-num">1</div><div class="stage-title">Resume Review</div><div class="stage-desc">LinkedIn & background verification. ~10% pass.</div></div>
+    <div class="stage"><div class="stage-num">2</div><div class="stage-title">Soft Skills</div><div class="stage-desc">English fluency, communication, remote work readiness.</div></div>
+    <div class="stage"><div class="stage-num">3</div><div class="stage-title">Technical</div><div class="stage-desc">~90 min deep dive: questions, live coding, system design.</div></div>
+    <div class="stage"><div class="stage-num">4</div><div class="stage-title">Pool Entry</div><div class="stage-desc">Matched with clients. Client may do their own interview.</div></div>
+  </div>
+
+  <h3>Stage 3: The Technical Interview (Your Main Challenge)</h3>
+  <div class="card">
+    <ul class="checklist">
+      <li><strong>Duration:</strong> ~90 minutes with an external senior interviewer</li>
+      <li><strong>Platform:</strong> Coderbyte for live coding</li>
+      <li><strong>Google/Docs:</strong> ALLOWED during interview</li>
+      <li><strong>AI/ChatGPT:</strong> NOT allowed</li>
+      <li><strong>Format:</strong> Deep technical questions + live coding + code review + system design</li>
+      <li><strong>Focus:</strong> Real-world scenarios, NOT LeetCode puzzles</li>
+      <li><strong>Key:</strong> They ask "WHY" not "HOW" - explain trade-offs, not syntax</li>
+    </ul>
+  </div>
+
+  <h3>What They Actually Evaluate</h3>
+  <div class="card-grid">
+    <div class="card stat-card"><div class="num">40</div><div class="label">Technical Excellence (pts)</div></div>
+    <div class="card stat-card"><div class="num">40</div><div class="label">Professional Capability (pts)</div></div>
+    <div class="card stat-card"><div class="num">20</div><div class="label">Soft Skills (pts)</div></div>
+  </div>
+
+  <div class="highlight-box warning">
+    <strong>Senior vs Mid-Level:</strong> They expect you to explain <em>why</em> technologies work a certain way, what trade-offs you considered, and where your solution breaks under scale. Memorized answers get flagged immediately. They want genuine understanding and opinionated thinking.
+  </div>
+
+  <h3>Senior Developer Expectations at Lemon.io</h3>
+  <table>
+    <tr><th>Area</th><th>Mid-Level</th><th>Senior</th></tr>
+    <tr><td>Coding</td><td>Completes tickets accurately</td><td>Reviews code, fixes tech debt, defines standards</td></tr>
+    <tr><td>Architecture</td><td>Understands existing systems</td><td>Designs systems for 3-5 year scalability</td></tr>
+    <tr><td>Testing</td><td>Writes tests when asked</td><td>Defines testing strategy, writes tests alongside code</td></tr>
+    <tr><td>Business</td><td>Follows specifications</td><td>Bridges business-technical gap, mentors juniors</td></tr>
+    <tr><td>DevOps</td><td>Executes deployment</td><td>Defines CI/CD, Docker, infrastructure standards</td></tr>
+    <tr><td>AI Tools</td><td>Uses for boilerplate</td><td>Directs multi-file refactoring, evaluates AI output critically</td></tr>
+  </table>
+</section>
+
+<!-- ==================== SCORING ==================== -->
+<section id="scoring">
+  <h2>Scoring Breakdown & What They Want</h2>
+
+  <h3>100-Point Scoring Framework</h3>
+  <div class="card">
+    <h4>Technical Excellence (40 points)</h4>
+    <ul>
+      <li><strong>Core stack proficiency</strong> - Deep knowledge of PHP/Laravel, React, Vue</li>
+      <li><strong>System design</strong> - Can architect scalable solutions</li>
+      <li><strong>Database knowledge</strong> - Schema design, indexing, optimization</li>
+      <li><strong>Architecture understanding</strong> - Design patterns, SOLID, DDD concepts</li>
+      <li><strong>Testing methodology</strong> - Unit, integration, E2E testing strategies</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>Professional Capabilities (40 points)</h4>
+    <ul>
+      <li><strong>Problem-solving approach</strong> - How you break down complex problems</li>
+      <li><strong>Code quality</strong> - Clean, maintainable, well-organized code</li>
+      <li><strong>Development speed</strong> - Efficient without sacrificing quality</li>
+      <li><strong>Innovation</strong> - Creative solutions, not just textbook answers</li>
+      <li><strong>Systems thinking</strong> - Understanding the bigger picture</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>Soft Skills (20 points)</h4>
+    <ul>
+      <li><strong>Communication clarity</strong> - Explain complex concepts simply</li>
+      <li><strong>English proficiency</strong> - Fluent technical communication</li>
+      <li><strong>Ownership & responsibility</strong> - Proactive, self-directed</li>
+      <li><strong>Leadership potential</strong> - Mentoring, guiding decisions</li>
+    </ul>
+  </div>
+
+  <div class="highlight-box info">
+    <strong>Pro tip:</strong> When you don't know something, say so honestly and explain how you'd find the answer. Lemon.io interviewers have noted they respect intellectual honesty far more than bluffing. They'll even help explain concepts during the interview - it's conversational, not adversarial.
+  </div>
+</section>
+
+<!-- ==================== PHP 8 CORE ==================== -->
+<section id="php-core">
+  <h2><span class="tag tag-php">PHP 8</span> Deep Dive - Senior Level</h2>
+
+  <h3>PHP 5 vs 7 vs 8 - Key Differences (Frequently Asked)</h3>
+  <div class="card">
+    <table>
+      <tr><th>Feature</th><th>PHP 5</th><th>PHP 7</th><th>PHP 8</th></tr>
+      <tr><td>Performance</td><td>Baseline</td><td>2x faster (Zend Engine 3)</td><td>JIT compiler, even faster</td></tr>
+      <tr><td>Type System</td><td>Type hints (basic)</td><td>Scalar types, return types</td><td>Union types, named args, enums, fibers</td></tr>
+      <tr><td>Error Handling</td><td>Fatal errors crash</td><td>Throwable interface, Error class</td><td>Match expression, null-safe operator</td></tr>
+      <tr><td>Null Handling</td><td>isset() everywhere</td><td>Null coalescing (??)</td><td>Null-safe operator (?->)</td></tr>
+      <tr><td>OOP</td><td>Basic</td><td>Anonymous classes</td><td>Constructor promotion, readonly, enums</td></tr>
+    </table>
+  </div>
+
+  <h3>PHP 8 Features You MUST Know</h3>
+
+  <h4>1. Named Arguments</h4>
+  <pre><code>// Before PHP 8
+htmlspecialchars($string, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
+
+// PHP 8 - named arguments (order doesn't matter)
+htmlspecialchars($string, double_encode: false);</code></pre>
+
+  <h4>2. Match Expression (replaces switch)</h4>
+  <pre><code>// switch - loose comparison, needs break, no return value
+// match - strict comparison, no break needed, returns value
+
+$result = match($status) {
+    'active', 'published' => 'visible',
+    'draft'               => 'hidden',
+    'archived'            => 'removed',
+    default               => throw new \InvalidArgumentException("Unknown: $status"),
+};</code></pre>
+
+  <h4>3. Constructor Property Promotion</h4>
+  <pre><code>// Before
+class User {
+    private string $name;
+    private string $email;
+
+    public function __construct(string $name, string $email) {
+        $this->name = $name;
+        $this->email = $email;
+    }
+}
+
+// PHP 8 - promoted
+class User {
+    public function __construct(
+        private string $name,
+        private string $email,
+    ) {}
+}</code></pre>
+
+  <h4>4. Enums (PHP 8.1)</h4>
+  <pre><code>enum Status: string {
+    case Active = 'active';
+    case Inactive = 'inactive';
+    case Suspended = 'suspended';
+
+    public function label(): string {
+        return match($this) {
+            self::Active    => 'Active User',
+            self::Inactive  => 'Inactive User',
+            self::Suspended => 'Account Suspended',
+        };
+    }
+}
+
+// Usage
+$status = Status::Active;
+$status->value;    // 'active'
+$status->label();  // 'Active User'
+Status::from('active'); // Status::Active
+Status::tryFrom('unknown'); // null (no exception)</code></pre>
+
+  <h4>5. Fibers (PHP 8.1) - Async Foundation</h4>
+  <pre><code>$fiber = new Fiber(function (): void {
+    $value = Fiber::suspend('paused');
+    echo "Resumed with: $value";
+});
+
+$result = $fiber->start(); // 'paused'
+$fiber->resume('hello');   // "Resumed with: hello"
+// Fibers enable non-blocking I/O - foundation for async frameworks like ReactPHP, Amp</code></pre>
+
+  <h4>6. Readonly Properties & Classes (PHP 8.1 / 8.2)</h4>
+  <pre><code>// PHP 8.1 - readonly properties
+class User {
+    public function __construct(
+        public readonly string $name,
+        public readonly string $email,
+    ) {}
+}
+
+// PHP 8.2 - entire readonly class
+readonly class UserDTO {
+    public function __construct(
+        public string $name,
+        public string $email,
+        public int $age,
+    ) {}
+}</code></pre>
+
+  <h4>7. Null-Safe Operator</h4>
+  <pre><code>// Before
+$country = null;
+if ($user !== null && $user->getAddress() !== null) {
+    $country = $user->getAddress()->getCountry();
+}
+
+// PHP 8
+$country = $user?->getAddress()?->getCountry();</code></pre>
+
+  <h4>8. Union & Intersection Types</h4>
+  <pre><code>// Union types (PHP 8.0)
+function process(int|string $input): int|false { ... }
+
+// Intersection types (PHP 8.1) - must implement ALL
+function save(Stringable&Countable $data): void { ... }
+
+// DNF types (PHP 8.2)
+function handle((Stringable&Countable)|null $data): void { ... }</code></pre>
+
+  <h3>== vs === (They WILL Ask This)</h3>
+  <div class="card">
+    <pre><code>// == (loose) - type juggling, compares value after coercion
+0 == 'foo'    // true in PHP 7, FALSE in PHP 8 (changed!)
+0 == ''       // true in PHP 7, FALSE in PHP 8
+0 == null     // true
+'' == null    // true
+1 == '1'      // true
+1 == '1abc'   // true (PHP 7), true with deprecation notice
+
+// === (strict) - compares value AND type, no coercion
+0 === 'foo'   // false
+0 === false   // false
+1 === '1'     // false
+null === ''   // false
+
+// SENIOR ANSWER: Always use === in production code.
+// Type juggling bugs are a common source of security vulnerabilities.
+// PHP 8 fixed many of the worst == behaviors, but === is still safer.</code></pre>
+  </div>
+
+  <h3>Memory Management & Garbage Collection</h3>
+  <div class="card">
+    <p><strong>Reference Counting:</strong> PHP uses reference counting as its primary memory management. Each variable has a refcount. When refcount hits 0, memory is freed immediately.</p>
+    <p><strong>Circular Reference GC:</strong> The cycle collector handles circular references (e.g., parent->child->parent). It runs when a root buffer of 10,000 potential roots is full.</p>
+    <pre><code>// Triggering GC manually
+gc_collect_cycles();     // Force garbage collection
+gc_enabled();            // Check if GC is enabled
+gc_mem_caches();         // Free memory caches (PHP 8.1)
+
+// Memory monitoring
+memory_get_usage(true);  // Real memory allocated from OS
+memory_get_peak_usage(); // Highest memory point in request
+
+// Senior tip: Use weak references for caching to prevent memory leaks
+$cache = new WeakMap();
+$cache[$object] = computeExpensiveResult($object);
+// When $object is garbage collected, the cache entry is too</code></pre>
+  </div>
+
+  <h3>Superglobals</h3>
+  <pre><code>$_GET      // URL query parameters
+$_POST     // POST request body
+$_REQUEST  // Merged GET + POST + COOKIE
+$_SERVER   // Server/execution environment info
+$_SESSION  // Session data
+$_COOKIE   // Cookie data
+$_FILES    // File upload data
+$_ENV      // Environment variables
+$GLOBALS   // All global variables
+
+// SENIOR NOTE: In modern Laravel, you rarely touch superglobals directly.
+// Use Request objects instead:
+$request->input('name');      // instead of $_POST['name']
+$request->query('page');      // instead of $_GET['page']
+$request->file('avatar');     // instead of $_FILES['avatar']
+$request->cookie('token');    // instead of $_COOKIE['token']</code></pre>
+</section>
+
+<!-- ==================== PHP OOP ==================== -->
+<section id="php-oop">
+  <h2><span class="tag tag-php">PHP</span> OOP & Design Patterns</h2>
+
+  <h3>Abstract Classes vs Interfaces (Common Question)</h3>
+  <div class="card">
+    <table>
+      <tr><th>Feature</th><th>Abstract Class</th><th>Interface</th></tr>
+      <tr><td>Methods</td><td>Can have implemented methods</td><td>Only signatures (PHP 7), can have defaults (PHP 8)</td></tr>
+      <tr><td>Properties</td><td>Can have properties</td><td>Only constants</td></tr>
+      <tr><td>Inheritance</td><td>Single (extends one)</td><td>Multiple (implements many)</td></tr>
+      <tr><td>Constructor</td><td>Can have</td><td>Cannot</td></tr>
+      <tr><td>Visibility</td><td>Any visibility</td><td>Public only</td></tr>
+      <tr><td>Use when</td><td>Shared behavior + state among related classes</td><td>Defining a contract/capability</td></tr>
+    </table>
+    <pre><code>// Interface = capability contract
+interface Cacheable {
+    public function getCacheKey(): string;
+    public function getCacheTTL(): int;
+}
+
+// Abstract class = shared base with partial implementation
+abstract class BaseRepository {
+    public function __construct(protected Model $model) {}
+
+    abstract public function findBySlug(string $slug): ?Model;
+
+    // Shared implementation
+    public function findById(int $id): ?Model {
+        return $this->model->find($id);
+    }
+}
+
+// A class can do both
+class UserRepository extends BaseRepository implements Cacheable {
+    public function findBySlug(string $slug): ?Model { ... }
+    public function getCacheKey(): string { return 'users'; }
+    public function getCacheTTL(): int { return 3600; }
+}</code></pre>
+  </div>
+
+  <h3>Traits (Multiple Behavior Reuse)</h3>
+  <pre><code>trait HasUuid {
+    public static function bootHasUuid(): void {
+        static::creating(function ($model) {
+            $model->uuid = (string) Str::uuid();
+        });
+    }
+}
+
+trait SoftDeletes {
+    // Laravel's built-in soft delete trait
+}
+
+class User extends Model {
+    use HasUuid, SoftDeletes;
+}
+
+// SENIOR: Know trait conflict resolution
+trait A { public function hello(): string { return 'A'; } }
+trait B { public function hello(): string { return 'B'; } }
+
+class C {
+    use A, B {
+        A::hello insteadof B;  // Use A's version
+        B::hello as helloB;    // Alias B's version
+    }
+}</code></pre>
+
+  <h3>SOLID Principles (Senior Must-Know)</h3>
+
+  <h4>S - Single Responsibility</h4>
+  <pre><code>// BAD - Controller does everything
+class UserController {
+    public function store(Request $request) {
+        $user = User::create($request->all());           // persistence
+        Mail::send(new WelcomeEmail($user));              // email
+        Slack::notify("New user: {$user->name}");         // notification
+        $user->subscription()->create(['plan' => 'free']);// billing
+        return response()->json($user);
+    }
+}
+
+// GOOD - Each class has one reason to change
+class UserController {
+    public function store(StoreUserRequest $request, CreateUserAction $action) {
+        $user = $action->execute($request->validated());
+        return new UserResource($user);
+    }
+}
+
+class CreateUserAction {
+    public function execute(array $data): User {
+        $user = DB::transaction(fn() => User::create($data));
+        event(new UserCreated($user)); // Listeners handle email, Slack, billing
+        return $user;
+    }
+}</code></pre>
+
+  <h4>O - Open/Closed (Open for extension, closed for modification)</h4>
+  <pre><code>// BAD - Must modify class for each new payment method
+class PaymentProcessor {
+    public function process(string $type, float $amount) {
+        if ($type === 'stripe') { ... }
+        elseif ($type === 'paypal') { ... }
+        elseif ($type === 'crypto') { ... } // Adding new types = modifying class
+    }
+}
+
+// GOOD - Extend via new implementations
+interface PaymentGateway {
+    public function charge(float $amount): PaymentResult;
+}
+
+class StripeGateway implements PaymentGateway { ... }
+class PayPalGateway implements PaymentGateway { ... }
+class CryptoGateway implements PaymentGateway { ... } // Just add new class
+
+class PaymentProcessor {
+    public function process(PaymentGateway $gateway, float $amount): PaymentResult {
+        return $gateway->charge($amount);
+    }
+}</code></pre>
+
+  <h4>L - Liskov Substitution</h4>
+  <pre><code>// BAD - Subclass changes behavior expectations
+class Rectangle {
+    public function setWidth(int $w): void { $this->width = $w; }
+    public function setHeight(int $h): void { $this->height = $h; }
+}
+
+class Square extends Rectangle {
+    public function setWidth(int $w): void {
+        $this->width = $w;
+        $this->height = $w; // Breaks LSP! Callers don't expect this
+    }
+}
+
+// GOOD - Use composition or separate interfaces
+interface Shape {
+    public function area(): float;
+}
+class Rectangle implements Shape { ... }
+class Square implements Shape { ... }</code></pre>
+
+  <h4>I - Interface Segregation</h4>
+  <pre><code>// BAD - Fat interface forces unnecessary implementations
+interface Worker {
+    public function code(): void;
+    public function test(): void;
+    public function deploy(): void;
+    public function managePeople(): void; // Junior devs don't manage
+}
+
+// GOOD - Segregated interfaces
+interface Coder { public function code(): void; }
+interface Tester { public function test(): void; }
+interface Deployer { public function deploy(): void; }
+interface Manager { public function managePeople(): void; }
+
+class SeniorDev implements Coder, Tester, Deployer { ... }
+class TechLead implements Coder, Tester, Deployer, Manager { ... }</code></pre>
+
+  <h4>D - Dependency Inversion</h4>
+  <pre><code>// BAD - High-level depends on low-level
+class OrderService {
+    private MySQLDatabase $db; // Concrete dependency
+    public function __construct() {
+        $this->db = new MySQLDatabase(); // Hardcoded
+    }
+}
+
+// GOOD - Both depend on abstractions
+interface OrderRepository {
+    public function save(Order $order): void;
+    public function findById(int $id): ?Order;
+}
+
+class OrderService {
+    public function __construct(
+        private OrderRepository $repository // Depends on interface
+    ) {}
+}
+
+// Laravel service container wires it up:
+$this->app->bind(OrderRepository::class, EloquentOrderRepository::class);</code></pre>
+
+  <h3>Key Design Patterns for Interview</h3>
+
+  <h4>Repository Pattern</h4>
+  <pre><code>interface UserRepositoryInterface {
+    public function findById(int $id): ?User;
+    public function findByEmail(string $email): ?User;
+    public function paginate(int $perPage = 15): LengthAwarePaginator;
+    public function create(array $data): User;
+    public function update(User $user, array $data): User;
+}
+
+class EloquentUserRepository implements UserRepositoryInterface {
+    public function __construct(private User $model) {}
+
+    public function findById(int $id): ?User {
+        return $this->model->find($id);
+    }
+
+    public function findByEmail(string $email): ?User {
+        return $this->model->where('email', $email)->first();
+    }
+
+    public function paginate(int $perPage = 15): LengthAwarePaginator {
+        return $this->model->latest()->paginate($perPage);
+    }
+
+    public function create(array $data): User {
+        return $this->model->create($data);
+    }
+
+    public function update(User $user, array $data): User {
+        $user->update($data);
+        return $user->fresh();
+    }
+}
+
+// Register in ServiceProvider
+$this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);</code></pre>
+
+  <h4>Strategy Pattern</h4>
+  <pre><code>interface ShippingCalculator {
+    public function calculate(Order $order): Money;
+}
+
+class FlatRateShipping implements ShippingCalculator {
+    public function calculate(Order $order): Money {
+        return Money::of(9.99, 'USD');
+    }
+}
+
+class WeightBasedShipping implements ShippingCalculator {
+    public function calculate(Order $order): Money {
+        return Money::of($order->totalWeight() * 0.50, 'USD');
+    }
+}
+
+class FreeShipping implements ShippingCalculator {
+    public function calculate(Order $order): Money {
+        return Money::of(0, 'USD');
+    }
+}
+
+// Usage - strategy injected at runtime
+class CheckoutService {
+    public function calculateTotal(Order $order, ShippingCalculator $shipping): Money {
+        return $order->subtotal()->plus($shipping->calculate($order));
+    }
+}</code></pre>
+</section>
+
+<!-- ==================== PHP SECURITY ==================== -->
+<section id="php-security">
+  <h2><span class="tag tag-php">PHP</span> Security & Performance</h2>
+
+  <h3>SQL Injection Prevention</h3>
+  <pre><code>// VULNERABLE - Never do this
+$query = "SELECT * FROM users WHERE email = '$email'";
+// Input: ' OR 1=1 --   (dumps all users)
+
+// SAFE - Prepared statements with PDO
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+
+// SAFE - Laravel Eloquent (automatically parameterized)
+User::where('email', $email)->first();
+
+// SAFE - Laravel Query Builder
+DB::table('users')->where('email', $email)->first();
+
+// CAREFUL - Raw expressions still need binding
+DB::select("SELECT * FROM users WHERE email = ?", [$email]); // SAFE
+DB::select("SELECT * FROM users WHERE email = '$email'");     // VULNERABLE!</code></pre>
+
+  <h3>XSS Prevention</h3>
+  <pre><code>// In Blade templates:
+{{ $userInput }}      // SAFE - auto-escaped via htmlspecialchars()
+{!! $userInput !!}    // DANGEROUS - raw HTML, only use for trusted content
+
+// In PHP:
+htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+
+// Content Security Policy header
+header("Content-Security-Policy: default-src 'self'; script-src 'self'");</code></pre>
+
+  <h3>Password Handling</h3>
+  <pre><code>// HASHING - use password_hash (bcrypt by default)
+$hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+// Or use PASSWORD_ARGON2ID (PHP 7.3+) for better security
+
+// VERIFYING
+if (password_verify($inputPassword, $storedHash)) {
+    // Correct password
+}
+
+// REHASHING - check if algorithm/cost changed
+if (password_needs_rehash($storedHash, PASSWORD_BCRYPT, ['cost' => 12])) {
+    $newHash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+    // Update stored hash
+}
+
+// Laravel does this automatically:
+Hash::make($password);
+Hash::check($input, $hash);
+Hash::needsRehash($hash);</code></pre>
+
+  <h3>CSRF Protection</h3>
+  <pre><code>// Laravel automatically includes CSRF middleware for web routes
+// In Blade forms:
+&lt;form method="POST"&gt;
+    @csrf   {{-- Generates hidden _token field --}}
+    ...
+&lt;/form&gt;
+
+// For AJAX (Axios auto-reads from cookie):
+// X-CSRF-TOKEN header or X-XSRF-TOKEN cookie
+
+// Excluding routes from CSRF (e.g., webhooks):
+// In VerifyCsrfToken middleware:
+protected $except = ['stripe/webhook', 'api/*'];</code></pre>
+
+  <h3>Performance Optimization (3+ Strategies Expected)</h3>
+  <div class="card">
+    <ol>
+      <li><strong>OPcache:</strong> Caches compiled PHP bytecode. Eliminates parsing/compiling on every request. Enable in php.ini: <code>opcache.enable=1</code></li>
+      <li><strong>JIT Compiler (PHP 8):</strong> Compiles bytecode to native machine code. Best for CPU-heavy operations, less impact on typical web apps.</li>
+      <li><strong>Database Query Optimization:</strong> Use eager loading (<code>with()</code>), proper indexes, avoid N+1 queries, use <code>select()</code> to limit columns.</li>
+      <li><strong>Caching:</strong> Redis/Memcached for query results, computed values, full-page cache. Laravel: <code>Cache::remember()</code></li>
+      <li><strong>Queue Heavy Work:</strong> Offload emails, image processing, API calls to background jobs.</li>
+      <li><strong>PHP-FPM Tuning:</strong> Optimize worker count, process management (dynamic vs static), memory limits.</li>
+      <li><strong>Preloading (PHP 7.4+):</strong> Load commonly used classes at startup via <code>opcache.preload</code>.</li>
+      <li><strong>Profiling:</strong> Use Xdebug, Blackfire, or Laravel Telescope to find bottlenecks before optimizing.</li>
+    </ol>
+  </div>
+
+  <h3>PDO vs MySQLi</h3>
+  <table>
+    <tr><th>Feature</th><th>PDO</th><th>MySQLi</th></tr>
+    <tr><td>Database Support</td><td>12+ databases (MySQL, PostgreSQL, SQLite, etc.)</td><td>MySQL only</td></tr>
+    <tr><td>API Style</td><td>OOP only</td><td>OOP + Procedural</td></tr>
+    <tr><td>Named Parameters</td><td>Yes (:name)</td><td>No (? only)</td></tr>
+    <tr><td>Prepared Statements</td><td>Yes (client + server side)</td><td>Yes (server side)</td></tr>
+    <tr><td>Use When</td><td>Database-agnostic code, most projects</td><td>MySQL-specific features needed</td></tr>
+  </table>
+  <div class="highlight-box info"><strong>Senior Answer:</strong> "I always use PDO through Laravel's database layer. The abstraction lets us switch between MySQL, PostgreSQL, and SQLite (for testing) without changing application code. Direct MySQLi is only justified when you need MySQL-specific features like async queries."</div>
+</section>
+
+<!-- ==================== LARAVEL CORE ==================== -->
+<section id="laravel-core">
+  <h2><span class="tag tag-laravel">Laravel</span> Service Container & Providers</h2>
+
+  <h3>The Service Container (IoC Container) - Most Important Concept</h3>
+  <div class="highlight-box warning">
+    <strong>This is the #1 Laravel question at Lemon.io.</strong> The service container is the heart of Laravel - understanding it deeply separates senior from mid-level developers.
+  </div>
+
+  <pre><code>// The service container manages class dependencies and performs dependency injection.
+// Think of it as a powerful factory that knows how to create and wire up objects.
+
+// BINDING - telling the container how to build things
+// 1. Simple binding
+$this->app->bind(PaymentGateway::class, function ($app) {
+    return new StripeGateway(config('services.stripe.key'));
+});
+
+// 2. Singleton - same instance every time
+$this->app->singleton(CartService::class, function ($app) {
+    return new CartService($app->make(SessionManager::class));
+});
+
+// 3. Interface to Implementation binding (most common)
+$this->app->bind(
+    UserRepositoryInterface::class,
+    EloquentUserRepository::class
+);
+
+// 4. Scoped - singleton within a request lifecycle (reset between requests in Octane)
+$this->app->scoped(RequestContext::class, function () {
+    return new RequestContext();
+});
+
+// RESOLVING - getting things out of the container
+$gateway = app(PaymentGateway::class);
+$gateway = resolve(PaymentGateway::class);
+// Or via constructor injection (preferred):
+class OrderController {
+    public function __construct(private PaymentGateway $gateway) {}
+}
+
+// CONTEXTUAL BINDING - different implementations in different contexts
+$this->app->when(PhotoController::class)
+    ->needs(Filesystem::class)
+    ->give(function () {
+        return Storage::disk('s3');
+    });
+
+$this->app->when(VideoController::class)
+    ->needs(Filesystem::class)
+    ->give(function () {
+        return Storage::disk('local');
+    });</code></pre>
+
+  <h3>Service Providers</h3>
+  <pre><code>// Service Providers are the central place to configure and bootstrap your application.
+// Every major Laravel feature is bootstrapped via a service provider.
+
+class PaymentServiceProvider extends ServiceProvider
+{
+    // register() - ONLY bind things into the container
+    // Called before any other provider's boot() method
+    public function register(): void
+    {
+        $this->app->singleton(PaymentGateway::class, function ($app) {
+            return match(config('payment.driver')) {
+                'stripe' => new StripeGateway(config('services.stripe.key')),
+                'paypal' => new PayPalGateway(config('services.paypal.key')),
+                default  => throw new \InvalidArgumentException('Unknown payment driver'),
+            };
+        });
+    }
+
+    // boot() - Called AFTER all providers are registered
+    // Use for event listeners, routes, view composers, etc.
+    public function boot(): void
+    {
+        Event::listen(PaymentProcessed::class, SendPaymentReceipt::class);
+    }
+
+    // Deferred providers - only loaded when needed
+    public $defer = true;
+
+    public function provides(): array
+    {
+        return [PaymentGateway::class];
+    }
+}</code></pre>
+
+  <h3>Middleware - Chain of Responsibility Pattern</h3>
+  <pre><code>// Middleware filters HTTP requests entering your application
+// Think of it as layers of an onion - request passes through each layer
+
+class EnsureApiVersion
+{
+    public function handle(Request $request, Closure $next, string $version = 'v1'): Response
+    {
+        if ($request->header('API-Version') !== $version) {
+            return response()->json(['error' => 'Unsupported API version'], 400);
+        }
+
+        // Before middleware logic
+        $response = $next($request); // Pass to next middleware / controller
+        // After middleware logic
+
+        $response->headers->set('X-API-Version', $version);
+        return $response;
+    }
+}
+
+// Terminable middleware - runs AFTER response is sent to browser
+class LogSlowRequests
+{
+    public function handle(Request $request, Closure $next): Response
+    {
+        $request->attributes->set('start_time', microtime(true));
+        return $next($request);
+    }
+
+    public function terminate(Request $request, Response $response): void
+    {
+        $duration = microtime(true) - $request->attributes->get('start_time');
+        if ($duration > 1.0) {
+            Log::warning('Slow request', [
+                'url' => $request->fullUrl(),
+                'duration' => round($duration, 3),
+            ]);
+        }
+    }
+}
+
+// Registering middleware (Laravel 11+):
+// bootstrap/app.php
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->append(EnsureApiVersion::class);
+    $middleware->alias(['api.version' => EnsureApiVersion::class]);
+})
+
+// Route-level middleware
+Route::get('/users', [UserController::class, 'index'])
+    ->middleware('api.version:v2');</code></pre>
+
+  <h3>Routing - Senior Level Knowledge</h3>
+  <pre><code>// Route model binding (implicit)
+Route::get('/users/{user}', function (User $user) {
+    return $user; // Laravel auto-resolves User by ID
+});
+
+// Custom key for route model binding
+Route::get('/users/{user:slug}', function (User $user) {
+    return $user; // Resolves by slug column
+});
+
+// Scoped bindings - ensures child belongs to parent
+Route::get('/users/{user}/posts/{post:slug}', function (User $user, Post $post) {
+    return $post; // post must belong to user
+})->scopeBindings();
+
+// Route groups with multiple middleware
+Route::prefix('api/v1')
+    ->middleware(['auth:sanctum', 'throttle:60,1'])
+    ->name('api.v1.')
+    ->group(function () {
+        Route::apiResource('users', UserController::class);
+        Route::apiResource('posts', PostController::class);
+    });
+
+// Missing model handling
+Route::get('/users/{user}', [UserController::class, 'show'])
+    ->missing(function () {
+        return response()->json(['error' => 'User not found'], 404);
+    });</code></pre>
+</section>
+
+<!-- ==================== LARAVEL ELOQUENT ==================== -->
+<section id="laravel-eloquent">
+  <h2><span class="tag tag-laravel">Laravel</span> Eloquent & Database</h2>
+
+  <h3>Eloquent Relationships (Know ALL of them)</h3>
+  <pre><code>class User extends Model
+{
+    // One to One
+    public function profile(): HasOne {
+        return $this->hasOne(Profile::class);
+    }
+
+    // One to Many
+    public function posts(): HasMany {
+        return $this->hasMany(Post::class);
+    }
+
+    // Many to Many (pivot table: role_user)
+    public function roles(): BelongsToMany {
+        return $this->belongsToMany(Role::class)
+            ->withPivot('assigned_at')    // Extra pivot columns
+            ->withTimestamps()
+            ->using(RoleUser::class);     // Custom pivot model
+    }
+
+    // Has Many Through
+    public function postComments(): HasManyThrough {
+        return $this->hasManyThrough(Comment::class, Post::class);
+    }
+
+    // Polymorphic - one model morphs to many types
+    public function image(): MorphOne {
+        return $this->morphOne(Image::class, 'imageable');
+    }
+
+    public function comments(): MorphMany {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    // Many-to-Many Polymorphic
+    public function tags(): MorphToMany {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
+}
+
+// Inverse relationships
+class Post extends Model {
+    public function user(): BelongsTo {
+        return $this->belongsTo(User::class);
+    }
+}
+
+class Comment extends Model {
+    // Polymorphic inverse
+    public function commentable(): MorphTo {
+        return $this->morphTo();
+    }
+}</code></pre>
+
+  <h3>N+1 Problem & Eager Loading (Critical for Senior)</h3>
+  <pre><code>// THE N+1 PROBLEM
+// BAD - 1 query for users + N queries for each user's posts
+$users = User::all();
+foreach ($users as $user) {
+    echo $user->posts->count(); // Each iteration = 1 query!
+}
+// If 100 users = 101 queries!
+
+// SOLUTION 1: Eager Loading with with()
+$users = User::with('posts')->get();
+// Only 2 queries: SELECT * FROM users; SELECT * FROM posts WHERE user_id IN (...)
+
+// SOLUTION 2: Nested eager loading
+$users = User::with(['posts.comments', 'profile', 'roles'])->get();
+
+// SOLUTION 3: Constrained eager loading
+$users = User::with(['posts' => function ($query) {
+    $query->where('published', true)
+          ->orderBy('created_at', 'desc')
+          ->limit(5);
+}])->get();
+
+// SOLUTION 4: Lazy eager loading (after initial query)
+$users = User::all();
+$users->load('posts');
+
+// SOLUTION 5: withCount for counting without loading
+$users = User::withCount('posts')->get();
+// $user->posts_count available, no posts loaded
+
+// PREVENT N+1 globally in development
+// AppServiceProvider::boot()
+Model::preventLazyLoading(!app()->isProduction());</code></pre>
+
+  <h3>Query Scopes</h3>
+  <pre><code>class Post extends Model
+{
+    // Local scope - reusable query constraints
+    public function scopePublished(Builder $query): Builder {
+        return $query->where('status', 'published')
+                     ->whereNotNull('published_at');
+    }
+
+    public function scopeByAuthor(Builder $query, User $user): Builder {
+        return $query->where('user_id', $user->id);
+    }
+
+    // Global scope - applied to ALL queries on this model
+    protected static function booted(): void {
+        static::addGlobalScope('active', function (Builder $query) {
+            $query->where('is_active', true);
+        });
+    }
+}
+
+// Usage
+Post::published()->byAuthor($user)->paginate(15);
+
+// Removing global scope for specific query
+Post::withoutGlobalScope('active')->get();</code></pre>
+
+  <h3>Migrations - Senior Knowledge</h3>
+  <pre><code>// Creating a migration
+php artisan make:migration create_orders_table
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('orders', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('order_number')->unique();
+            $table->enum('status', ['pending', 'processing', 'shipped', 'delivered']);
+            $table->decimal('total', 10, 2);
+            $table->json('metadata')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+
+            // Composite index for frequent queries
+            $table->index(['user_id', 'status', 'created_at']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('orders');
+    }
+};
+
+// SENIOR: Zero-downtime migrations for large tables
+// 1. Add nullable column first (non-blocking)
+// 2. Backfill data in batches
+// 3. Add NOT NULL constraint after backfill
+// 4. Never rename columns in production - add new, migrate, drop old</code></pre>
+
+  <h3>Database Seeding</h3>
+  <pre><code>class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Order matters for foreign keys
+        $this->call([
+            RoleSeeder::class,
+            UserSeeder::class,
+            PostSeeder::class,
+        ]);
+    }
+}
+
+class UserSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Create specific test user
+        User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'role' => 'admin',
+        ]);
+
+        // Create 50 random users with related data
+        User::factory(50)
+            ->has(Post::factory(3)->has(Comment::factory(5)))
+            ->has(Profile::factory())
+            ->create();
+    }
+}</code></pre>
+</section>
+
+<!-- ==================== LARAVEL ADVANCED ==================== -->
+<section id="laravel-advanced">
+  <h2><span class="tag tag-laravel">Laravel</span> Queues, Events & Jobs</h2>
+
+  <h3>Queue System (When and How)</h3>
+  <div class="highlight-box info">
+    <strong>When to use queues:</strong> Any task that takes more than ~200ms and doesn't need an immediate response. Email sending, image processing, API calls to external services, report generation, search indexing.
+  </div>
+
+  <pre><code>// Creating a Job
+class ProcessPodcastUpload implements ShouldQueue
+{
+    use Queueable;
+
+    public int $tries = 3;           // Retry up to 3 times
+    public int $timeout = 120;       // Max 2 minutes
+    public int $backoff = 30;        // Wait 30s between retries
+    public int $maxExceptions = 2;   // Stop after 2 exceptions
+
+    public function __construct(
+        public readonly Podcast $podcast,
+        public readonly string $filePath,
+    ) {}
+
+    public function handle(AudioProcessor $processor): void
+    {
+        $processed = $processor->transcode($this->filePath, 'mp3');
+        $this->podcast->update([
+            'processed_path' => $processed,
+            'status' => 'ready',
+        ]);
+    }
+
+    // Determine if the job should be retried
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('Podcast processing failed', [
+            'podcast_id' => $this->podcast->id,
+            'error' => $exception->getMessage(),
+        ]);
+        $this->podcast->update(['status' => 'failed']);
+    }
+
+    // Unique jobs - prevent duplicate processing
+    public function uniqueId(): string
+    {
+        return $this->podcast->id;
+    }
+}
+
+// Dispatching jobs
+ProcessPodcastUpload::dispatch($podcast, $filePath);
+ProcessPodcastUpload::dispatch($podcast, $filePath)->onQueue('audio');
+ProcessPodcastUpload::dispatch($podcast, $filePath)->delay(now()->addMinutes(5));
+
+// Job chaining - sequential execution
+Bus::chain([
+    new OptimizeImage($photo),
+    new GenerateThumbnails($photo),
+    new NotifyUser($photo->user),
+])->dispatch();
+
+// Job batching - parallel execution with completion callback
+Bus::batch([
+    new ImportCsvChunk($chunk1),
+    new ImportCsvChunk($chunk2),
+    new ImportCsvChunk($chunk3),
+])->then(function (Batch $batch) {
+    Log::info('All chunks imported!');
+})->catch(function (Batch $batch, \Throwable $e) {
+    Log::error('Batch failed', ['error' => $e->getMessage()]);
+})->dispatch();</code></pre>
+
+  <h3>Events & Listeners</h3>
+  <pre><code>// Event - a data container describing what happened
+class OrderPlaced
+{
+    use Dispatchable, SerializesModels;
+
+    public function __construct(
+        public readonly Order $order,
+        public readonly User $user,
+    ) {}
+}
+
+// Listener - reacts to the event
+class SendOrderConfirmation implements ShouldQueue
+{
+    public function handle(OrderPlaced $event): void
+    {
+        Mail::to($event->user)->send(new OrderConfirmationMail($event->order));
+    }
+}
+
+class UpdateInventory implements ShouldQueue
+{
+    public function handle(OrderPlaced $event): void
+    {
+        foreach ($event->order->items as $item) {
+            $item->product->decrement('stock', $item->quantity);
+        }
+    }
+}
+
+class NotifyWarehouse implements ShouldQueue
+{
+    public function handle(OrderPlaced $event): void
+    {
+        WarehouseService::notify($event->order);
+    }
+}
+
+// Registering in EventServiceProvider
+protected $listen = [
+    OrderPlaced::class => [
+        SendOrderConfirmation::class,
+        UpdateInventory::class,
+        NotifyWarehouse::class,
+    ],
+];
+
+// Dispatching
+event(new OrderPlaced($order, $user));
+// or
+OrderPlaced::dispatch($order, $user);</code></pre>
+
+  <h3>Observers</h3>
+  <pre><code>// Observers group model event listeners for a single model
+class UserObserver
+{
+    public function creating(User $user): void
+    {
+        $user->uuid = (string) Str::uuid();
+    }
+
+    public function created(User $user): void
+    {
+        $user->profile()->create();
+        event(new UserRegistered($user));
+    }
+
+    public function updating(User $user): void
+    {
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+    }
+
+    public function deleting(User $user): void
+    {
+        // Clean up related data
+        $user->tokens()->delete();
+        $user->notifications()->delete();
+    }
+}
+
+// Register in AppServiceProvider
+User::observe(UserObserver::class);
+
+// SENIOR TIP: Observers can cause hidden side effects.
+// For complex business logic, prefer explicit Events + Listeners
+// over implicit Observers. Observers are best for simple,
+// model-level concerns (generating slugs, UUIDs, audit trails).</code></pre>
+
+  <h3>Task Scheduling</h3>
+  <pre><code>// app/Console/Kernel.php or routes/console.php (Laravel 11+)
+Schedule::command('reports:daily')->dailyAt('08:00')->emailOutputTo('admin@app.com');
+Schedule::job(new CleanupTempFiles)->hourly()->withoutOverlapping();
+Schedule::call(fn() => Cache::flush())->weekly()->sundays()->at('03:00');
+
+// Prevent task overlap
+Schedule::command('import:feeds')
+    ->everyFifteenMinutes()
+    ->withoutOverlapping(30)  // Lock expires after 30 min
+    ->runInBackground()
+    ->onOneServer();          // Only run on one server in a cluster</code></pre>
+</section>
+
+<!-- ==================== LARAVEL AUTH ==================== -->
+<section id="laravel-auth">
+  <h2><span class="tag tag-laravel">Laravel</span> Auth, Policies & Gates</h2>
+
+  <h3>Authentication Methods</h3>
+  <div class="card">
+    <table>
+      <tr><th>Method</th><th>Use Case</th><th>How It Works</th></tr>
+      <tr><td>Session-based</td><td>Web apps (Blade/Inertia)</td><td>Cookie + server-side session</td></tr>
+      <tr><td>Sanctum (Token)</td><td>SPAs + Mobile APIs</td><td>Personal access tokens or SPA cookie auth</td></tr>
+      <tr><td>Passport</td><td>Full OAuth2 server</td><td>OAuth2 grant types, third-party app auth</td></tr>
+      <tr><td>Fortify</td><td>Headless auth backend</td><td>Registration, login, 2FA, email verify (no UI)</td></tr>
+      <tr><td>Breeze / Jetstream</td><td>Starter kits</td><td>Full auth scaffolding with UI</td></tr>
+    </table>
+  </div>
+
+  <h3>Gates - Simple Authorization Checks</h3>
+  <pre><code>// Define in AuthServiceProvider
+Gate::define('update-post', function (User $user, Post $post): bool {
+    return $user->id === $post->user_id || $user->isAdmin();
+});
+
+Gate::define('manage-users', function (User $user): bool {
+    return $user->hasRole('admin');
+});
+
+// Usage in controllers
+if (Gate::allows('update-post', $post)) {
+    // Authorized
+}
+
+Gate::authorize('update-post', $post); // Throws 403 if denied
+
+// Usage in Blade
+@can('update-post', $post)
+    &lt;button&gt;Edit Post&lt;/button&gt;
+@endcan
+
+// Before - runs before all other gates (superadmin bypass)
+Gate::before(function (User $user, string $ability) {
+    if ($user->isSuperAdmin()) {
+        return true; // Bypass all checks
+    }
+});</code></pre>
+
+  <h3>Policies - Resource-Based Authorization</h3>
+  <pre><code>class PostPolicy
+{
+    // Runs before all other checks
+    public function before(User $user, string $ability): ?bool
+    {
+        if ($user->isBanned()) {
+            return false; // Deny everything for banned users
+        }
+        return null; // Fall through to specific checks
+    }
+
+    public function viewAny(User $user): bool
+    {
+        return true; // Everyone can list posts
+    }
+
+    public function view(User $user, Post $post): bool
+    {
+        return $post->published || $user->id === $post->user_id;
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->hasVerifiedEmail();
+    }
+
+    public function update(User $user, Post $post): bool
+    {
+        return $user->id === $post->user_id;
+    }
+
+    public function delete(User $user, Post $post): bool
+    {
+        return $user->id === $post->user_id || $user->isAdmin();
+    }
+
+    public function restore(User $user, Post $post): bool
+    {
+        return $user->isAdmin();
+    }
+
+    public function forceDelete(User $user, Post $post): bool
+    {
+        return $user->isSuperAdmin();
+    }
+}
+
+// Controller usage
+class PostController extends Controller
+{
+    public function update(Request $request, Post $post)
+    {
+        $this->authorize('update', $post); // Uses PostPolicy::update
+
+        $post->update($request->validated());
+        return new PostResource($post);
+    }
+}
+
+// Gates vs Policies:
+// Gates = simple, standalone checks (manage-users, view-dashboard)
+// Policies = resource-specific, organized by model (PostPolicy, UserPolicy)</code></pre>
+
+  <h3>Sanctum for SPA Authentication</h3>
+  <pre><code>// For SPA (React/Vue) + Laravel API on same domain:
+// 1. SPA calls /sanctum/csrf-cookie to get XSRF token
+// 2. SPA sends login request with credentials
+// 3. Laravel sets session cookie
+// 4. All subsequent requests include cookie automatically
+
+// For Mobile/Third-party API:
+$token = $user->createToken('mobile-app', ['posts:read', 'posts:write']);
+return ['token' => $token->plainTextToken];
+
+// Protecting routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('posts', PostController::class);
+});
+
+// Checking abilities
+if ($user->tokenCan('posts:write')) {
+    // Token has write permission
+}</code></pre>
+</section>
+
+<!-- ==================== LARAVEL ARCHITECTURE ==================== -->
+<section id="laravel-architecture">
+  <h2><span class="tag tag-laravel">Laravel</span> Architecture & Patterns</h2>
+
+  <h3>Action Pattern (Recommended for Senior)</h3>
+  <pre><code>// Actions encapsulate a single business operation
+// Better than fat controllers or service classes with 20 methods
+
+class CreateOrderAction
+{
+    public function __construct(
+        private OrderRepository $orders,
+        private PaymentGateway $payment,
+        private InventoryService $inventory,
+    ) {}
+
+    public function execute(User $user, array $items, string $paymentMethod): Order
+    {
+        return DB::transaction(function () use ($user, $items, $paymentMethod) {
+            // 1. Validate inventory
+            $this->inventory->assertAvailable($items);
+
+            // 2. Create order
+            $order = $this->orders->create([
+                'user_id' => $user->id,
+                'status' => OrderStatus::Pending,
+                'total' => $this->calculateTotal($items),
+            ]);
+
+            // 3. Attach items
+            foreach ($items as $item) {
+                $order->items()->create($item);
+            }
+
+            // 4. Process payment
+            $this->payment->charge($order->total, $paymentMethod);
+            $order->update(['status' => OrderStatus::Paid]);
+
+            // 5. Fire event (listeners handle email, inventory decrement, etc.)
+            event(new OrderPlaced($order));
+
+            return $order;
+        });
+    }
+
+    private function calculateTotal(array $items): int { ... }
+}
+
+// Controller stays thin
+class OrderController extends Controller
+{
+    public function store(StoreOrderRequest $request, CreateOrderAction $action)
+    {
+        $order = $action->execute(
+            $request->user(),
+            $request->validated('items'),
+            $request->validated('payment_method'),
+        );
+
+        return new OrderResource($order);
+    }
+}</code></pre>
+
+  <h3>Form Requests (Validation)</h3>
+  <pre><code>class StoreOrderRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return $this->user()->hasVerifiedEmail();
+    }
+
+    public function rules(): array
+    {
+        return [
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.product_id' => ['required', 'exists:products,id'],
+            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:100'],
+            'payment_method' => ['required', 'in:card,paypal,bank_transfer'],
+            'shipping_address_id' => ['required', 'exists:addresses,id',
+                Rule::exists('addresses', 'id')->where('user_id', $this->user()->id),
+            ],
+            'coupon_code' => ['nullable', 'string', 'exists:coupons,code'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'items.required' => 'Your cart is empty.',
+            'items.*.product_id.exists' => 'One of the selected products no longer exists.',
+        ];
+    }
+
+    // Modify data before validation
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'coupon_code' => strtoupper($this->coupon_code ?? ''),
+        ]);
+    }
+}</code></pre>
+
+  <h3>API Resources (Transforming Responses)</h3>
+  <pre><code>class UserResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->when($request->user()?->isAdmin(), $this->email),
+            'avatar_url' => $this->avatar_url,
+            'posts_count' => $this->whenCounted('posts'),
+            'profile' => new ProfileResource($this->whenLoaded('profile')),
+            'roles' => RoleResource::collection($this->whenLoaded('roles')),
+            'created_at' => $this->created_at->toISOString(),
+            'links' => [
+                'self' => route('users.show', $this),
+                'posts' => route('users.posts.index', $this),
+            ],
+        ];
+    }
+}
+
+// Usage
+return UserResource::collection(
+    User::with(['profile', 'roles'])->withCount('posts')->paginate()
+);</code></pre>
+
+  <h3>Caching Strategies</h3>
+  <pre><code>// Simple caching
+$users = Cache::remember('users:active', 3600, function () {
+    return User::where('active', true)->get();
+});
+
+// Cache tags (Redis/Memcached only)
+Cache::tags(['users', 'profiles'])->put("user:{$id}", $user, 3600);
+Cache::tags(['users'])->flush(); // Flush all user-related caches
+
+// Model-level cache invalidation
+class User extends Model
+{
+    protected static function booted(): void
+    {
+        static::saved(fn(User $user) => Cache::forget("user:{$user->id}"));
+        static::deleted(fn(User $user) => Cache::forget("user:{$user->id}"));
+    }
+}
+
+// Query caching pattern
+class UserRepository
+{
+    public function findById(int $id): ?User
+    {
+        return Cache::remember(
+            "user:{$id}",
+            now()->addHour(),
+            fn() => User::with('profile')->find($id)
+        );
+    }
+}
+
+// Response caching for read-heavy endpoints
+// Use spatie/laravel-responsecache for automatic HTTP response caching</code></pre>
+
+  <h3>Testing in Laravel</h3>
+  <pre><code>// Feature test (integration)
+class OrderTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_authenticated_user_can_create_order(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create(['price' => 2999, 'stock' => 10]);
+
+        $response = $this->actingAs($user)->postJson('/api/orders', [
+            'items' => [
+                ['product_id' => $product->id, 'quantity' => 2],
+            ],
+            'payment_method' => 'card',
+        ]);
+
+        $response->assertStatus(201)
+                 ->assertJsonStructure(['data' => ['id', 'total', 'status']]);
+
+        $this->assertDatabaseHas('orders', [
+            'user_id' => $user->id,
+            'status' => 'paid',
+        ]);
+
+        $this->assertEquals(8, $product->fresh()->stock); // 10 - 2
+    }
+
+    public function test_guest_cannot_create_order(): void
+    {
+        $this->postJson('/api/orders', [])->assertStatus(401);
+    }
+}
+
+// Unit test with mocking
+class CreateOrderActionTest extends TestCase
+{
+    public function test_fires_order_placed_event(): void
+    {
+        Event::fake([OrderPlaced::class]);
+
+        $action = app(CreateOrderAction::class);
+        $action->execute($user, $items, 'card');
+
+        Event::assertDispatched(OrderPlaced::class, function ($event) {
+            return $event->order->user_id === $this->user->id;
+        });
+    }
+}</code></pre>
+</section>
+
+<!-- ==================== REACT CORE ==================== -->
+<section id="react-core">
+  <h2><span class="tag tag-react">React</span> Hooks & State Management</h2>
+
+  <h3>Core Hooks - Senior Level Understanding</h3>
+
+  <h4>useState - Beyond the Basics</h4>
+  <pre><code>// Lazy initialization - expensive computation only runs on mount
+const [data, setData] = useState(() => {
+  return JSON.parse(localStorage.getItem('formData')) || defaultValues;
+});
+
+// Functional updates - when new state depends on old state
+setCount(prev => prev + 1); // Always correct, even in async
+
+// Object state - always spread to avoid losing fields
+const [form, setForm] = useState({ name: '', email: '' });
+setForm(prev => ({ ...prev, name: 'John' })); // Preserves email
+
+// SENIOR PITFALL: useState is async batched
+// Multiple setState calls in the same event handler are batched (React 18+)
+function handleClick() {
+  setCount(c => c + 1);
+  setFlag(f => !f);
+  // Only ONE re-render happens, not two
+}</code></pre>
+
+  <h4>useEffect - Deep Understanding Required</h4>
+  <pre><code>// Lifecycle mapping:
+useEffect(() => { ... }, []);        // componentDidMount
+useEffect(() => { ... }, [dep]);     // componentDidUpdate (for dep)
+useEffect(() => { return () => {} }, []); // componentWillUnmount
+
+// CORRECT cleanup pattern for subscriptions
+useEffect(() => {
+  const controller = new AbortController();
+
+  async function fetchData() {
+    try {
+      const res = await fetch(`/api/users/${userId}`, {
+        signal: controller.signal,
+      });
+      const data = await res.json();
+      setUser(data);
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setError(err.message);
+      }
+    }
+  }
+
+  fetchData();
+
+  return () => controller.abort(); // Cleanup on unmount or userId change
+}, [userId]);
+
+// SENIOR: useEffect runs after paint (non-blocking)
+// useLayoutEffect runs before paint (blocking) - use for DOM measurements
+useLayoutEffect(() => {
+  const { height } = ref.current.getBoundingClientRect();
+  setHeight(height); // No visual flicker
+}, []);</code></pre>
+
+  <h4>useRef - Not Just for DOM</h4>
+  <pre><code>// DOM reference
+const inputRef = useRef(null);
+&lt;input ref={inputRef} /&gt;
+inputRef.current.focus();
+
+// Mutable value that persists across renders WITHOUT causing re-render
+const renderCount = useRef(0);
+renderCount.current++; // Doesn't trigger re-render
+
+// Previous value pattern
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
+// Stable callback reference (avoid re-subscribing)
+const callbackRef = useRef(onSave);
+callbackRef.current = onSave; // Update ref every render
+useEffect(() => {
+  const handler = () => callbackRef.current();
+  window.addEventListener('save', handler);
+  return () => window.removeEventListener('save', handler);
+}, []); // Empty deps - handler never changes</code></pre>
+
+  <h4>useReducer - Complex State Logic</h4>
+  <pre><code>// When state transitions have complex logic or multiple sub-values
+const initialState = { items: [], loading: false, error: null, page: 1 };
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'FETCH_START':
+      return { ...state, loading: true, error: null };
+    case 'FETCH_SUCCESS':
+      return { ...state, loading: false, items: [...state.items, ...action.payload] };
+    case 'FETCH_ERROR':
+      return { ...state, loading: false, error: action.payload };
+    case 'NEXT_PAGE':
+      return { ...state, page: state.page + 1 };
+    case 'RESET':
+      return initialState;
+    default:
+      throw new Error(`Unknown action: ${action.type}`);
+  }
+}
+
+const [state, dispatch] = useReducer(reducer, initialState);
+
+dispatch({ type: 'FETCH_START' });
+dispatch({ type: 'FETCH_SUCCESS', payload: data });
+
+// SENIOR: useReducer > useState when:
+// - Next state depends on previous state in complex ways
+// - Multiple sub-values update together
+// - State transitions need to be testable (pure function)
+// - You want to pass dispatch down instead of multiple setters</code></pre>
+
+  <h3>Context API</h3>
+  <pre><code>// Creating context with TypeScript pattern
+const AuthContext = createContext(null);
+
+function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuth().then(setUser).finally(() => setLoading(false));
+  }, []);
+
+  const login = useCallback(async (credentials) => {
+    const user = await api.login(credentials);
+    setUser(user);
+  }, []);
+
+  const logout = useCallback(async () => {
+    await api.logout();
+    setUser(null);
+  }, []);
+
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
+    user, loading, login, logout
+  }), [user, loading, login, logout]);
+
+  return (
+    &lt;AuthContext.Provider value={value}&gt;
+      {children}
+    &lt;/AuthContext.Provider&gt;
+  );
+}
+
+// Custom hook with error boundary
+function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === null) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
+
+// SENIOR: Context is NOT state management. It's dependency injection.
+// Every context consumer re-renders when the value changes.
+// Split contexts by update frequency:
+// UserContext (rarely changes) vs ThemeContext (toggle) vs CartContext (frequent)</code></pre>
+
+  <h3>Custom Hooks</h3>
+  <pre><code>// Debounced value hook
+function useDebounce(value, delay = 300) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Fetch with loading/error states
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+
+    fetch(url, { signal: controller.signal })
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(setData)
+      .catch(err => {
+        if (err.name !== 'AbortError') setError(err);
+      })
+      .finally(() => setLoading(false));
+
+    return () => controller.abort();
+  }, [url]);
+
+  return { data, loading, error };
+}
+
+// Local storage hook
+function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() => {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+
+  return [value, setValue];
+}</code></pre>
+</section>
+
+<!-- ==================== REACT ADVANCED ==================== -->
+<section id="react-advanced">
+  <h2><span class="tag tag-react">React</span> Advanced Patterns</h2>
+
+  <h3>Higher-Order Components (HOCs)</h3>
+  <pre><code>// HOC = function that takes a component and returns enhanced component
+function withAuth(WrappedComponent) {
+  return function AuthenticatedComponent(props) {
+    const { user, loading } = useAuth();
+
+    if (loading) return &lt;Spinner /&gt;;
+    if (!user) return &lt;Navigate to="/login" /&gt;;
+
+    return &lt;WrappedComponent {...props} user={user} /&gt;;
+  };
+}
+
+const ProtectedDashboard = withAuth(Dashboard);
+
+// SENIOR: HOCs are a legacy pattern. Prefer custom hooks for new code.
+// HOCs were necessary before hooks existed (class components).
+// Downsides: wrapper hell, prop name collisions, hard to type in TypeScript.</code></pre>
+
+  <h3>Render Props Pattern</h3>
+  <pre><code>// Component that shares behavior via a render function prop
+function MouseTracker({ render }) {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handler = (e) => setPosition({ x: e.clientX, y: e.clientY });
+    window.addEventListener('mousemove', handler);
+    return () => window.removeEventListener('mousemove', handler);
+  }, []);
+
+  return render(position);
+}
+
+// Usage
+&lt;MouseTracker render={({ x, y }) => (
+  &lt;div&gt;Mouse at {x}, {y}&lt;/div&gt;
+)} /&gt;
+
+// SENIOR: Like HOCs, render props are mostly replaced by custom hooks:
+function useMousePosition() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  // ... same logic
+  return position;
+}</code></pre>
+
+  <h3>Compound Components Pattern</h3>
+  <pre><code>// Components that work together sharing implicit state
+const TabsContext = createContext();
+
+function Tabs({ children, defaultTab }) {
+  const [activeTab, setActiveTab] = useState(defaultTab);
+  return (
+    &lt;TabsContext.Provider value={{ activeTab, setActiveTab }}&gt;
+      &lt;div className="tabs"&gt;{children}&lt;/div&gt;
+    &lt;/TabsContext.Provider&gt;
+  );
+}
+
+function TabList({ children }) {
+  return &lt;div className="tab-list"&gt;{children}&lt;/div&gt;;
+}
+
+function Tab({ id, children }) {
+  const { activeTab, setActiveTab } = useContext(TabsContext);
+  return (
+    &lt;button
+      className={activeTab === id ? 'active' : ''}
+      onClick={() => setActiveTab(id)}
+    &gt;{children}&lt;/button&gt;
+  );
+}
+
+function TabPanel({ id, children }) {
+  const { activeTab } = useContext(TabsContext);
+  return activeTab === id ? &lt;div&gt;{children}&lt;/div&gt; : null;
+}
+
+// Usage - clean, declarative API
+&lt;Tabs defaultTab="profile"&gt;
+  &lt;TabList&gt;
+    &lt;Tab id="profile"&gt;Profile&lt;/Tab&gt;
+    &lt;Tab id="settings"&gt;Settings&lt;/Tab&gt;
+  &lt;/TabList&gt;
+  &lt;TabPanel id="profile"&gt;&lt;ProfileForm /&gt;&lt;/TabPanel&gt;
+  &lt;TabPanel id="settings"&gt;&lt;SettingsForm /&gt;&lt;/TabPanel&gt;
+&lt;/Tabs&gt;</code></pre>
+
+  <h3>Error Boundaries</h3>
+  <pre><code>// Error boundaries MUST be class components (no hook equivalent yet)
+class ErrorBoundary extends React.Component {
+  state = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // Log to error reporting service
+    Sentry.captureException(error, { extra: errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || &lt;h2&gt;Something went wrong.&lt;/h2&gt;;
+    }
+    return this.props.children;
+  }
+}
+
+// Usage
+&lt;ErrorBoundary fallback={&lt;ErrorPage /&gt;}&gt;
+  &lt;App /&gt;
+&lt;/ErrorBoundary&gt;
+
+// Granular error boundaries
+&lt;Layout&gt;
+  &lt;ErrorBoundary fallback={&lt;SidebarError /&gt;}&gt;
+    &lt;Sidebar /&gt;
+  &lt;/ErrorBoundary&gt;
+  &lt;ErrorBoundary fallback={&lt;ContentError /&gt;}&gt;
+    &lt;MainContent /&gt;
+  &lt;/ErrorBoundary&gt;
+&lt;/Layout&gt;</code></pre>
+
+  <h3>Controlled vs Uncontrolled Components</h3>
+  <pre><code>// CONTROLLED - React state drives the input value
+function ControlledForm() {
+  const [email, setEmail] = useState('');
+
+  return (
+    &lt;input
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+    /&gt;
+  );
+  // React is the "single source of truth"
+  // Use when: validation on every keystroke, conditional disabling,
+  // enforcing format, dynamic form fields
+}
+
+// UNCONTROLLED - DOM holds the value, access via ref
+function UncontrolledForm() {
+  const emailRef = useRef();
+
+  const handleSubmit = () => {
+    console.log(emailRef.current.value);
+  };
+
+  return &lt;input ref={emailRef} defaultValue="" /&gt;;
+  // Use when: simple forms, file inputs, integrating with non-React code
+}
+
+// SENIOR: React Hook Form uses uncontrolled components internally
+// for performance - fewer re-renders than controlled forms.
+// For complex forms, use react-hook-form or Formik, not manual state.</code></pre>
+
+  <h3>Redux (Core Concepts)</h3>
+  <pre><code>// Redux Toolkit (modern Redux - always use this, not vanilla Redux)
+import { createSlice, configureStore } from '@reduxjs/toolkit';
+
+const cartSlice = createSlice({
+  name: 'cart',
+  initialState: { items: [], total: 0 },
+  reducers: {
+    addItem(state, action) {
+      // RTK uses Immer - "mutating" syntax is actually immutable
+      state.items.push(action.payload);
+      state.total += action.payload.price;
+    },
+    removeItem(state, action) {
+      const index = state.items.findIndex(i => i.id === action.payload);
+      if (index !== -1) {
+        state.total -= state.items[index].price;
+        state.items.splice(index, 1);
+      }
+    },
+    clearCart(state) {
+      state.items = [];
+      state.total = 0;
+    },
+  },
+});
+
+export const { addItem, removeItem, clearCart } = cartSlice.actions;
+
+const store = configureStore({
+  reducer: { cart: cartSlice.reducer },
+});
+
+// Async actions with createAsyncThunk
+const fetchProducts = createAsyncThunk('products/fetch', async (_, { rejectWithValue }) => {
+  try {
+    const res = await fetch('/api/products');
+    return await res.json();
+  } catch (err) {
+    return rejectWithValue(err.message);
+  }
+});
+
+// In component
+const { items, total } = useSelector(state => state.cart);
+const dispatch = useDispatch();
+dispatch(addItem({ id: 1, name: 'Widget', price: 9.99 }));</code></pre>
+</section>
+
+<!-- ==================== REACT PERFORMANCE ==================== -->
+<section id="react-perf">
+  <h2><span class="tag tag-react">React</span> Performance & Architecture</h2>
+
+  <h3>useMemo & useCallback (Performance Optimization)</h3>
+  <pre><code>// useMemo - memoize expensive computed values
+const sortedItems = useMemo(() => {
+  return items
+    .filter(item => item.status === filter)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}, [items, filter]); // Only recalculates when items or filter change
+
+// useCallback - memoize function references
+const handleDelete = useCallback((id) => {
+  setItems(prev => prev.filter(item => item.id !== id));
+}, []); // Stable reference across renders
+
+// SENIOR: When to use useMemo/useCallback:
+// 1. Passed as prop to React.memo() child component
+// 2. Used as dependency in useEffect/useMemo/useCallback
+// 3. Genuinely expensive computation (sorting 10k items)
+//
+// When NOT to use:
+// 1. Simple calculations (a + b)
+// 2. Not passed to children or used as deps
+// 3. The component re-renders for other reasons anyway
+// Premature memoization adds complexity without benefit.</code></pre>
+
+  <h3>React.memo - Preventing Re-renders</h3>
+  <pre><code>// React.memo skips re-render if props haven't changed (shallow compare)
+const ExpensiveList = React.memo(function ExpensiveList({ items, onSelect }) {
+  return (
+    &lt;ul&gt;
+      {items.map(item => (
+        &lt;li key={item.id} onClick={() => onSelect(item.id)}&gt;
+          {item.name}
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+});
+
+// Custom comparison function
+const Chart = React.memo(
+  function Chart({ data, config }) { ... },
+  (prevProps, nextProps) => {
+    // Return true to skip re-render
+    return prevProps.data.length === nextProps.data.length
+        && prevProps.config.type === nextProps.config.type;
+  }
+);</code></pre>
+
+  <h3>Code Splitting & Lazy Loading</h3>
+  <pre><code>import { lazy, Suspense } from 'react';
+
+// Route-level code splitting
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+
+function App() {
+  return (
+    &lt;Suspense fallback={&lt;PageSkeleton /&gt;}&gt;
+      &lt;Routes&gt;
+        &lt;Route path="/dashboard" element={&lt;Dashboard /&gt;} /&gt;
+        &lt;Route path="/settings" element={&lt;Settings /&gt;} /&gt;
+        &lt;Route path="/analytics" element={&lt;Analytics /&gt;} /&gt;
+      &lt;/Routes&gt;
+    &lt;/Suspense&gt;
+  );
+}
+
+// Named exports with lazy
+const LazyModal = lazy(() =>
+  import('./components/Modal').then(module => ({
+    default: module.ConfirmModal,
+  }))
+);
+
+// Prefetching on hover
+function NavLink({ to, children }) {
+  const prefetch = () => {
+    // Webpack magic comment triggers prefetch
+    import(/* webpackPrefetch: true */ `./pages/${to}`);
+  };
+  return &lt;Link to={to} onMouseEnter={prefetch}&gt;{children}&lt;/Link&gt;;
+}</code></pre>
+
+  <h3>Virtual DOM & Reconciliation (Interview Deep Dive)</h3>
+  <div class="card">
+    <h4>How React Rendering Works:</h4>
+    <ol>
+      <li><strong>Trigger:</strong> State change, prop change, or parent re-render</li>
+      <li><strong>Render phase:</strong> React calls your component function, creating a new virtual DOM tree (React elements). This is pure - no side effects.</li>
+      <li><strong>Reconciliation:</strong> React diffs the new virtual DOM with the previous one using the "diffing algorithm" (O(n) heuristic):
+        <ul>
+          <li>Different element types? Tear down old tree, build new one</li>
+          <li>Same element type? Update only changed attributes</li>
+          <li>Lists? Use <code>key</code> prop to match elements across renders</li>
+        </ul>
+      </li>
+      <li><strong>Commit phase:</strong> React applies the minimal set of actual DOM mutations. This is where useEffect runs.</li>
+    </ol>
+
+    <h4>React Fiber (React 16+):</h4>
+    <p>Fiber is the reimplementation of React's core algorithm. It enables:</p>
+    <ul>
+      <li><strong>Incremental rendering</strong> - split rendering work into chunks</li>
+      <li><strong>Prioritization</strong> - urgent updates (typing) over non-urgent (data fetch results)</li>
+      <li><strong>Concurrency</strong> - pause, abort, or reuse work</li>
+      <li><strong>Suspense & Transitions</strong> - built on Fiber's ability to pause rendering</li>
+    </ul>
+  </div>
+
+  <h3>Key Prop - Why It Matters</h3>
+  <pre><code>// BAD - using index as key
+{items.map((item, index) => (
+  &lt;Item key={index} data={item} /&gt;
+))}
+// Problems: reordering, inserting, deleting causes wrong elements
+// to update, losing internal state (form inputs, animations)
+
+// GOOD - stable unique identifier
+{items.map(item => (
+  &lt;Item key={item.id} data={item} /&gt;
+))}
+
+// SENIOR TIP: Key can also be used to FORCE re-mount a component
+// Changing key destroys and recreates the component (fresh state)
+&lt;UserProfile key={userId} userId={userId} /&gt;
+// When userId changes, UserProfile fully remounts with fresh state</code></pre>
+
+  <h3>Server-Side Rendering (SSR) Overview</h3>
+  <div class="card">
+    <table>
+      <tr><th>Approach</th><th>Framework</th><th>When to Use</th></tr>
+      <tr><td>CSR (Client)</td><td>Vite + React</td><td>Dashboards, internal tools, apps behind auth</td></tr>
+      <tr><td>SSR (Server)</td><td>Next.js</td><td>SEO-critical pages, dynamic content</td></tr>
+      <tr><td>SSG (Static)</td><td>Next.js / Astro</td><td>Blogs, docs, marketing pages</td></tr>
+      <tr><td>ISR (Incremental)</td><td>Next.js</td><td>E-commerce, pages that change periodically</td></tr>
+    </table>
+    <p><strong>Hydration:</strong> The process where React attaches event listeners to server-rendered HTML. The HTML is visible immediately (fast FCP), then becomes interactive after JS loads and hydrates.</p>
+  </div>
+</section>
+
+<!-- ==================== VUE CORE ==================== -->
+<section id="vue-core">
+  <h2><span class="tag tag-vue">Vue 3</span> Composition API & Reactivity</h2>
+
+  <h3>Options API vs Composition API</h3>
+  <pre><code>// OPTIONS API (Vue 2 style - still works in Vue 3)
+export default {
+  data() {
+    return { count: 0, name: '' };
+  },
+  computed: {
+    doubleCount() { return this.count * 2; },
+  },
+  methods: {
+    increment() { this.count++; },
+  },
+  mounted() {
+    console.log('Component mounted');
+  },
+};
+
+// COMPOSITION API (Vue 3 - preferred for complex components)
+import { ref, computed, onMounted } from 'vue';
+
+export default {
+  setup() {
+    const count = ref(0);
+    const name = ref('');
+    const doubleCount = computed(() => count.value * 2);
+
+    function increment() {
+      count.value++;
+    }
+
+    onMounted(() => {
+      console.log('Component mounted');
+    });
+
+    return { count, name, doubleCount, increment };
+  },
+};
+
+// SCRIPT SETUP (Vue 3.2+ - best DX, recommended)
+&lt;script setup&gt;
+import { ref, computed, onMounted } from 'vue';
+
+const count = ref(0);
+const name = ref('');
+const doubleCount = computed(() => count.value * 2);
+
+function increment() {
+  count.value++;
+}
+
+onMounted(() => {
+  console.log('Component mounted');
+});
+// No explicit return needed - everything is auto-exposed to template
+&lt;/script&gt;</code></pre>
+
+  <h3>Reactivity System - Deep Understanding</h3>
+  <pre><code>// ref() - for primitives (wraps in { value: ... })
+const count = ref(0);
+count.value++;             // Must use .value in JS
+// In template: {{ count }} (auto-unwrapped, no .value needed)
+
+// reactive() - for objects (uses Proxy)
+const state = reactive({
+  user: { name: 'John', email: 'john@test.com' },
+  posts: [],
+});
+state.user.name = 'Jane';  // No .value needed, direct mutation
+
+// SENIOR: ref vs reactive - when to use which?
+// ref() - primitives, or when you need to reassign the whole value
+// reactive() - objects/arrays you'll mutate properties of
+// ref() is generally preferred because:
+//   1. Works consistently with primitives AND objects
+//   2. Can be destructured without losing reactivity
+//   3. Explicit .value makes reactivity visible in code
+
+// GOTCHA: Destructuring reactive() loses reactivity
+const { name } = reactive({ name: 'John' }); // name is NOT reactive
+// FIX: Use toRefs()
+const { name } = toRefs(reactive({ name: 'John' })); // name IS reactive (ref)
+
+// shallowRef / shallowReactive - only track top-level changes
+const largeList = shallowRef([]);
+// Replacing the array triggers update, mutating items does not
+largeList.value = [...largeList.value, newItem]; // Triggers
+largeList.value.push(newItem); // Does NOT trigger (use triggerRef)
+
+// computed - cached derived state
+const fullName = computed(() => `${firstName.value} ${lastName.value}`);
+// Only recalculates when firstName or lastName change
+
+// Writable computed
+const fullName = computed({
+  get: () => `${first.value} ${last.value}`,
+  set: (val) => {
+    const [f, l] = val.split(' ');
+    first.value = f;
+    last.value = l;
+  },
+});</code></pre>
+
+  <h3>Watchers</h3>
+  <pre><code>import { watch, watchEffect } from 'vue';
+
+// watch - explicit dependencies, access old/new values
+watch(count, (newVal, oldVal) => {
+  console.log(`Changed from ${oldVal} to ${newVal}`);
+});
+
+// Watch multiple sources
+watch([firstName, lastName], ([newFirst, newLast], [oldFirst, oldLast]) => {
+  console.log(`Name changed: ${newFirst} ${newLast}`);
+});
+
+// Deep watch (for nested objects)
+watch(
+  () => state.user,
+  (newUser) => { saveToApi(newUser); },
+  { deep: true }
+);
+
+// Immediate watch (runs on mount too)
+watch(searchQuery, (query) => {
+  fetchResults(query);
+}, { immediate: true });
+
+// watchEffect - auto-tracks dependencies (like React's useEffect)
+watchEffect(() => {
+  // Automatically tracks searchQuery.value and page.value
+  fetchResults(searchQuery.value, page.value);
+});
+
+// Cleanup in watchEffect
+watchEffect((onCleanup) => {
+  const controller = new AbortController();
+  fetchData(id.value, { signal: controller.signal });
+  onCleanup(() => controller.abort());
+});</code></pre>
+
+  <h3>Lifecycle Hooks</h3>
+  <pre><code>import {
+  onBeforeMount,
+  onMounted,
+  onBeforeUpdate,
+  onUpdated,
+  onBeforeUnmount,
+  onUnmounted,
+  onActivated,      // keep-alive activated
+  onDeactivated,    // keep-alive deactivated
+  onErrorCaptured,  // error from descendant component
+} from 'vue';
+
+onMounted(() => {
+  // DOM is ready, fetch data, set up listeners
+  fetchData();
+  window.addEventListener('resize', handleResize);
+});
+
+onUnmounted(() => {
+  // Cleanup: remove listeners, cancel timers, abort requests
+  window.removeEventListener('resize', handleResize);
+});
+
+onErrorCaptured((err, component, info) => {
+  logError(err, info);
+  return false; // Prevent error from propagating further
+});</code></pre>
+
+  <h3>Composables (Vue's Custom Hooks)</h3>
+  <pre><code>// composables/useFetch.js
+import { ref, watchEffect } from 'vue';
+
+export function useFetch(url) {
+  const data = ref(null);
+  const error = ref(null);
+  const loading = ref(true);
+
+  watchEffect(async (onCleanup) => {
+    const controller = new AbortController();
+    onCleanup(() => controller.abort());
+
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const res = await fetch(url.value || url, { signal: controller.signal });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      data.value = await res.json();
+    } catch (err) {
+      if (err.name !== 'AbortError') error.value = err;
+    } finally {
+      loading.value = false;
+    }
+  });
+
+  return { data, error, loading };
+}
+
+// composables/useDebounce.js
+export function useDebounce(value, delay = 300) {
+  const debounced = ref(value.value);
+  let timer;
+
+  watch(value, (newVal) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { debounced.value = newVal; }, delay);
+  });
+
+  return debounced;
+}
+
+// Usage in component
+&lt;script setup&gt;
+import { useFetch } from '@/composables/useFetch';
+import { useDebounce } from '@/composables/useDebounce';
+
+const search = ref('');
+const debouncedSearch = useDebounce(search, 300);
+const { data: users, loading, error } = useFetch(
+  computed(() => `/api/users?q=${debouncedSearch.value}`)
+);
+&lt;/script&gt;</code></pre>
+
+  <h3>v-if vs v-show</h3>
+  <div class="card">
+    <table>
+      <tr><th></th><th>v-if</th><th>v-show</th></tr>
+      <tr><td>How it works</td><td>Adds/removes element from DOM</td><td>Toggles CSS display property</td></tr>
+      <tr><td>Initial render cost</td><td>Low (lazy - skipped if false)</td><td>High (always rendered)</td></tr>
+      <tr><td>Toggle cost</td><td>High (create/destroy component)</td><td>Low (CSS toggle)</td></tr>
+      <tr><td>Use when</td><td>Condition rarely changes</td><td>Condition toggles frequently</td></tr>
+      <tr><td>With v-for</td><td>v-if has higher priority than v-for in Vue 3</td><td>Not recommended with v-for</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== VUE ADVANCED ==================== -->
+<section id="vue-advanced">
+  <h2><span class="tag tag-vue">Vue</span> Pinia, Router & SSR</h2>
+
+  <h3>Pinia (State Management - Replaced Vuex)</h3>
+  <pre><code>// stores/useCartStore.js
+import { defineStore } from 'pinia';
+
+export const useCartStore = defineStore('cart', () => {
+  // State
+  const items = ref([]);
+  const coupon = ref(null);
+
+  // Getters (computed)
+  const total = computed(() =>
+    items.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  );
+
+  const discountedTotal = computed(() => {
+    if (!coupon.value) return total.value;
+    return total.value * (1 - coupon.value.discount / 100);
+  });
+
+  const itemCount = computed(() =>
+    items.value.reduce((sum, item) => sum + item.quantity, 0)
+  );
+
+  // Actions
+  function addItem(product) {
+    const existing = items.value.find(i => i.id === product.id);
+    if (existing) {
+      existing.quantity++;
+    } else {
+      items.value.push({ ...product, quantity: 1 });
+    }
+  }
+
+  function removeItem(productId) {
+    items.value = items.value.filter(i => i.id !== productId);
+  }
+
+  async function applyCoupon(code) {
+    const res = await fetch(`/api/coupons/${code}`);
+    if (res.ok) coupon.value = await res.json();
+  }
+
+  function clearCart() {
+    items.value = [];
+    coupon.value = null;
+  }
+
+  return { items, coupon, total, discountedTotal, itemCount,
+           addItem, removeItem, applyCoupon, clearCart };
+});
+
+// Usage in component
+&lt;script setup&gt;
+import { useCartStore } from '@/stores/useCartStore';
+
+const cart = useCartStore();
+// Direct access: cart.items, cart.total, cart.addItem(product)
+&lt;/script&gt;</code></pre>
+
+  <h3>Pinia vs Vuex</h3>
+  <table>
+    <tr><th>Feature</th><th>Vuex</th><th>Pinia</th></tr>
+    <tr><td>Mutations</td><td>Required (commit)</td><td>No mutations, direct state changes</td></tr>
+    <tr><td>TypeScript</td><td>Weak support</td><td>First-class TypeScript support</td></tr>
+    <tr><td>Modules</td><td>Nested modules with namespacing</td><td>Flat stores, compose by importing</td></tr>
+    <tr><td>API</td><td>state, getters, mutations, actions</td><td>state, getters, actions (or setup syntax)</td></tr>
+    <tr><td>DevTools</td><td>Yes</td><td>Yes (better)</td></tr>
+    <tr><td>Bundle size</td><td>~6KB</td><td>~1.5KB</td></tr>
+    <tr><td>Status</td><td>Maintenance mode</td><td>Officially recommended for Vue 3</td></tr>
+  </table>
+
+  <h3>Vue Router</h3>
+  <pre><code>import { createRouter, createWebHistory } from 'vue-router';
+
+const routes = [
+  {
+    path: '/',
+    component: () => import('@/layouts/MainLayout.vue'),
+    children: [
+      { path: '', name: 'home', component: () => import('@/pages/Home.vue') },
+      {
+        path: 'users/:id',
+        name: 'user',
+        component: () => import('@/pages/UserProfile.vue'),
+        props: true,  // Pass route params as props
+        // Per-route guard
+        beforeEnter: (to, from) => {
+          if (!isAuthenticated()) return '/login';
+        },
+      },
+    ],
+  },
+  {
+    path: '/admin',
+    component: () => import('@/layouts/AdminLayout.vue'),
+    meta: { requiresAuth: true, role: 'admin' },
+    children: [
+      { path: '', component: () => import('@/pages/admin/Dashboard.vue') },
+      { path: 'users', component: () => import('@/pages/admin/Users.vue') },
+    ],
+  },
+  { path: '/:pathMatch(.*)*', component: () => import('@/pages/404.vue') },
+];
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    return savedPosition || { top: 0 };
+  },
+});
+
+// Global navigation guard
+router.beforeEach((to, from) => {
+  if (to.meta.requiresAuth && !isAuthenticated()) {
+    return { name: 'login', query: { redirect: to.fullPath } };
+  }
+});
+
+// In component
+&lt;script setup&gt;
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute();     // reactive route object
+const router = useRouter();   // navigation methods
+
+const userId = computed(() => route.params.id);
+
+function goToUser(id) {
+  router.push({ name: 'user', params: { id } });
+  // vs router.push(`/users/${id}`) - named routes are safer
+}
+&lt;/script&gt;</code></pre>
+
+  <h3>Vue Performance Optimization</h3>
+  <div class="card">
+    <ol>
+      <li><strong>v-once:</strong> Render once, never update. Use for static content: <code>&lt;h1 v-once&gt;{{ title }}&lt;/h1&gt;</code></li>
+      <li><strong>v-memo:</strong> Cache template sub-trees: <code>&lt;div v-memo="[item.id, item.selected]"&gt;</code></li>
+      <li><strong>keep-alive:</strong> Cache component instances: <code>&lt;keep-alive&gt;&lt;router-view /&gt;&lt;/keep-alive&gt;</code></li>
+      <li><strong>Virtual scrolling:</strong> Only render visible items in long lists (use vue-virtual-scroller)</li>
+      <li><strong>Async components:</strong> <code>defineAsyncComponent(() => import('./Heavy.vue'))</code></li>
+      <li><strong>shallowRef/shallowReactive:</strong> Avoid deep reactivity for large data structures</li>
+      <li><strong>Computed caching:</strong> Always prefer computed over methods for derived data</li>
+    </ol>
+  </div>
+
+  <h3>SSR & Hydration</h3>
+  <div class="card">
+    <p><strong>Nuxt 3</strong> is the standard SSR framework for Vue 3 (like Next.js for React).</p>
+    <p><strong>Hydration</strong> is the process of making server-rendered HTML interactive on the client:</p>
+    <ol>
+      <li>Server renders Vue components to HTML string</li>
+      <li>HTML is sent to browser (fast First Contentful Paint)</li>
+      <li>Browser loads Vue JS bundle</li>
+      <li>Vue "hydrates" - attaches event listeners and makes components reactive</li>
+      <li>App becomes fully interactive (Time to Interactive)</li>
+    </ol>
+    <p><strong>Hydration mismatch:</strong> When server HTML doesn't match what Vue would render on client. Common causes: browser-only APIs (<code>window</code>, <code>localStorage</code>), date/time formatting, random values. Fix with <code>&lt;ClientOnly&gt;</code> wrapper or <code>onMounted</code> for client-only logic.</p>
+  </div>
+</section>
+
+<!-- ==================== SYSTEM DESIGN ==================== -->
+<section id="system-design">
+  <h2><span class="tag tag-senior">Senior</span> System Design</h2>
+
+  <h3>How to Answer System Design Questions</h3>
+  <div class="highlight-box info">
+    <strong>Framework:</strong> Requirements -> High-Level Design -> Component Deep Dive -> Scaling -> Trade-offs
+  </div>
+
+  <h3>Example: Design an E-Commerce Order System</h3>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-btn">1. Clarify Requirements</button>
+      <div class="accordion-body">
+        <ul>
+          <li>How many orders per day? (scale)</li>
+          <li>Payment methods supported?</li>
+          <li>Inventory management - real-time or eventually consistent?</li>
+          <li>International? Multi-currency? Tax calculation?</li>
+          <li>Return/refund workflow needed?</li>
+        </ul>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-btn">2. High-Level Architecture</button>
+      <div class="accordion-body">
+        <pre><code>Client (React/Vue SPA)
+  |
+  v
+API Gateway / Load Balancer (Nginx)
+  |
+  v
+Laravel Application (Stateless)
+  |--- Auth Service (Sanctum/Passport)
+  |--- Order Service
+  |--- Payment Service (Stripe SDK)
+  |--- Inventory Service
+  |--- Notification Service
+  |
+  v
+Data Layer
+  |--- MySQL/PostgreSQL (orders, users, products)
+  |--- Redis (sessions, cache, rate limiting, queues)
+  |--- S3 (product images, invoices)
+  |
+  v
+Background Jobs (Laravel Queues + Redis/SQS)
+  |--- Email notifications
+  |--- Invoice PDF generation
+  |--- Inventory sync
+  |--- Analytics events</code></pre>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-btn">3. Database Schema (Key Tables)</button>
+      <div class="accordion-body">
+        <pre><code>orders
+  - id, user_id, status (enum), total, currency
+  - shipping_address_id, billing_address_id
+  - payment_intent_id, paid_at
+  - created_at, updated_at, deleted_at
+
+order_items
+  - id, order_id, product_id, variant_id
+  - quantity, unit_price, total_price
+  - metadata (JSON - customizations)
+
+products
+  - id, name, slug, description, base_price
+  - status, stock_quantity
+  - category_id, brand_id
+
+Key Indexes:
+  - orders: (user_id, status, created_at) - user order history
+  - orders: (status, created_at) - admin dashboard
+  - products: (category_id, status) - category browsing
+  - order_items: (order_id) - order details lookup</code></pre>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-btn">4. Scaling Considerations</button>
+      <div class="accordion-body">
+        <ul>
+          <li><strong>Horizontal scaling:</strong> Stateless Laravel behind load balancer, sessions in Redis</li>
+          <li><strong>Database:</strong> Read replicas for product browsing, primary for writes</li>
+          <li><strong>Caching:</strong> Redis for product catalog (invalidate on update), cart data, rate limiting</li>
+          <li><strong>Queue:</strong> SQS or Redis for async processing - emails, inventory, analytics</li>
+          <li><strong>CDN:</strong> Product images, static assets via CloudFront/Cloudflare</li>
+          <li><strong>Race conditions:</strong> Use database-level locks or Redis locks for inventory decrements</li>
+        </ul>
+        <pre><code>// Preventing overselling with pessimistic locking
+DB::transaction(function () use ($productId, $quantity) {
+    $product = Product::where('id', $productId)
+        ->lockForUpdate()  // SELECT ... FOR UPDATE
+        ->first();
+
+    if ($product->stock < $quantity) {
+        throw new InsufficientStockException();
+    }
+
+    $product->decrement('stock', $quantity);
+});</code></pre>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-btn">5. Trade-offs Discussion</button>
+      <div class="accordion-body">
+        <ul>
+          <li><strong>Monolith vs Microservices:</strong> Start monolith (Laravel), extract services only when team/scale demands it. Premature microservices add operational complexity.</li>
+          <li><strong>Sync vs Async:</strong> Payment must be sync (user waits). Email, invoice, analytics should be async (queued).</li>
+          <li><strong>Strong vs Eventual Consistency:</strong> Inventory needs strong consistency (pessimistic locking). Analytics can be eventually consistent.</li>
+          <li><strong>SQL vs NoSQL:</strong> SQL for transactional data (orders). Consider Elasticsearch for product search if catalog > 100K products.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3>Common System Design Topics</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Authentication System</h4>
+      <ul>
+        <li>JWT vs Session-based</li>
+        <li>OAuth 2.0 flows</li>
+        <li>Token refresh strategies</li>
+        <li>Rate limiting login attempts</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Real-Time Features</h4>
+      <ul>
+        <li>WebSockets (Laravel Reverb / Pusher)</li>
+        <li>Server-Sent Events</li>
+        <li>Long polling fallback</li>
+        <li>Broadcasting events</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>File Upload System</h4>
+      <ul>
+        <li>Direct-to-S3 upload (pre-signed URLs)</li>
+        <li>Chunked uploads for large files</li>
+        <li>Image processing pipeline (queue)</li>
+        <li>Virus scanning</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>API Design</h4>
+      <ul>
+        <li>RESTful conventions</li>
+        <li>API versioning strategies</li>
+        <li>Pagination (cursor vs offset)</li>
+        <li>Rate limiting & throttling</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DEVOPS ==================== -->
+<section id="devops">
+  <h2><span class="tag tag-senior">Senior</span> DevOps & CI/CD</h2>
+
+  <h3>Docker for Laravel</h3>
+  <pre><code># Dockerfile (production)
+FROM php:8.3-fpm-alpine
+
+RUN apk add --no-cache \
+    postgresql-dev \
+    && docker-php-ext-install pdo pdo_pgsql opcache
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+COPY . .
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
+
+EXPOSE 9000
+CMD ["php-fpm"]</code></pre>
+
+  <pre><code># docker-compose.yml
+services:
+  app:
+    build: .
+    volumes:
+      - .:/var/www
+    depends_on:
+      - db
+      - redis
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  queue:
+    build: .
+    command: php artisan queue:work --tries=3 --timeout=90
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  db_data:</code></pre>
+
+  <h3>CI/CD Pipeline (GitHub Actions)</h3>
+  <pre><code># .github/workflows/ci.yml
+name: CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: testing
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports: ['5432:5432']
+      redis:
+        image: redis:7
+        ports: ['6379:6379']
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: xdebug
+
+      - run: composer install --prefer-dist --no-progress
+      - run: cp .env.testing .env
+      - run: php artisan key:generate
+      - run: php artisan migrate --force
+      - run: php artisan test --coverage --min=80
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploy to production"
+      # SSH deploy, Docker push, or platform-specific deployment</code></pre>
+
+  <h3>Laravel Production Optimization Checklist</h3>
+  <div class="card">
+    <ul class="checklist">
+      <li><code>php artisan config:cache</code> - Cache configuration</li>
+      <li><code>php artisan route:cache</code> - Cache routes</li>
+      <li><code>php artisan view:cache</code> - Compile Blade views</li>
+      <li><code>php artisan event:cache</code> - Cache event/listener mappings</li>
+      <li><code>composer install --optimize-autoloader --no-dev</code></li>
+      <li>Enable OPcache in PHP config</li>
+      <li>Use Redis for sessions, cache, and queues</li>
+      <li>Set up queue workers with Supervisor</li>
+      <li>Configure proper logging (stack: daily + stderr)</li>
+      <li>Set <code>APP_DEBUG=false</code> and <code>APP_ENV=production</code></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ==================== PHP & LARAVEL QUIZ ==================== -->
+<section id="quiz-php">
+  <h2><span class="tag tag-php">Quiz</span> PHP & Laravel - 15 Questions</h2>
+  <p>Test your knowledge. These mirror Lemon.io's question style and difficulty.</p>
+
+  <div class="quiz-container" id="phpQuiz">
+    <div class="quiz-q" data-correct="c">
+      <h4>1. What does PHP 8's match expression return when no arm matches and there's no default?</h4>
+      <label><input type="radio" name="pq1" value="a"> null</label>
+      <label><input type="radio" name="pq1" value="b"> false</label>
+      <label><input type="radio" name="pq1" value="c"> Throws UnhandledMatchError</label>
+      <label><input type="radio" name="pq1" value="d"> Returns the input value</label>
+      <div class="quiz-explanation">Unlike switch (which silently falls through), match() throws an <code>UnhandledMatchError</code> if no arm matches. This is a deliberate design choice to prevent silent bugs.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <h4>2. In Laravel, what's the difference between <code>$this->app->bind()</code> and <code>$this->app->singleton()</code>?</h4>
+      <label><input type="radio" name="pq2" value="a"> bind() is for interfaces, singleton() is for classes</label>
+      <label><input type="radio" name="pq2" value="b"> bind() creates a new instance each time, singleton() returns the same instance</label>
+      <label><input type="radio" name="pq2" value="c"> singleton() is deprecated in favor of bind()</label>
+      <label><input type="radio" name="pq2" value="d"> bind() is eager, singleton() is lazy</label>
+      <div class="quiz-explanation"><code>bind()</code> resolves a new instance every time it's requested from the container. <code>singleton()</code> resolves once and returns that same instance for all subsequent requests. Both are lazy (resolve on first request).</div>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <h4>3. Which method prevents N+1 queries in Laravel?</h4>
+      <label><input type="radio" name="pq3" value="a"> User::lazy('posts')->get()</label>
+      <label><input type="radio" name="pq3" value="b"> User::join('posts')->get()</label>
+      <label><input type="radio" name="pq3" value="c"> User::preload('posts')->get()</label>
+      <label><input type="radio" name="pq3" value="d"> User::with('posts')->get()</label>
+      <div class="quiz-explanation"><code>with()</code> is eager loading - it loads the relationship in a separate query using WHERE IN. This converts N+1 queries into just 2 queries regardless of how many users exist.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <h4>4. What is the purpose of Laravel's Service Container?</h4>
+      <label><input type="radio" name="pq4" value="a"> To store application configuration</label>
+      <label><input type="radio" name="pq4" value="b"> To manage database connections</label>
+      <label><input type="radio" name="pq4" value="c"> To manage class dependencies and perform dependency injection</label>
+      <label><input type="radio" name="pq4" value="d"> To handle HTTP request routing</label>
+      <div class="quiz-explanation">The Service Container (IoC Container) is the heart of Laravel. It manages class dependencies, resolves them automatically through dependency injection, and acts as a central registry for binding interfaces to implementations.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <h4>5. In PHP 8.1, what is a Fiber?</h4>
+      <label><input type="radio" name="pq5" value="a"> A lightweight thread for parallel execution</label>
+      <label><input type="radio" name="pq5" value="b"> A pausable/resumable function for cooperative concurrency</label>
+      <label><input type="radio" name="pq5" value="c"> A new type of generator with return values</label>
+      <label><input type="radio" name="pq5" value="d"> An async/await implementation</label>
+      <div class="quiz-explanation">Fibers are stackful coroutines - they can be suspended and resumed. They enable cooperative (not preemptive) concurrency. They're the foundation for async frameworks like ReactPHP and Amp, but they're NOT threads (no parallelism).</div>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <h4>6. When should you use a Gate vs a Policy in Laravel?</h4>
+      <label><input type="radio" name="pq6" value="a"> Gates for simple standalone checks; Policies for resource/model-based authorization</label>
+      <label><input type="radio" name="pq6" value="b"> Gates for API routes; Policies for web routes</label>
+      <label><input type="radio" name="pq6" value="c"> Gates are deprecated; always use Policies</label>
+      <label><input type="radio" name="pq6" value="d"> Gates for admins; Policies for regular users</label>
+      <div class="quiz-explanation">Gates are closures for simple, standalone authorization checks (e.g., "can manage users"). Policies are classes organized around a model with methods for each action (view, create, update, delete). Use Policies when authorization logic is tied to a specific Eloquent model.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <h4>7. What happens when you call <code>Model::preventLazyLoading()</code> in Laravel?</h4>
+      <label><input type="radio" name="pq7" value="a"> All relationships must be defined in $with property</label>
+      <label><input type="radio" name="pq7" value="b"> Relationships can only be loaded via join queries</label>
+      <label><input type="radio" name="pq7" value="c"> Accessing a non-eager-loaded relationship throws an exception</label>
+      <label><input type="radio" name="pq7" value="d"> All queries automatically eager load all relationships</label>
+      <div class="quiz-explanation">When enabled (typically only in non-production), accessing a relationship that wasn't eager loaded throws a <code>LazyLoadingViolationException</code>. This helps you catch N+1 query problems during development. Use <code>Model::preventLazyLoading(!app()->isProduction())</code>.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <h4>8. What is the correct order of method calls in a Laravel Service Provider?</h4>
+      <label><input type="radio" name="pq8" value="a"> boot() runs first, then register()</label>
+      <label><input type="radio" name="pq8" value="b"> They run simultaneously</label>
+      <label><input type="radio" name="pq8" value="c"> register() runs only if boot() succeeds</label>
+      <label><input type="radio" name="pq8" value="d"> register() runs on ALL providers first, then boot() on ALL providers</label>
+      <div class="quiz-explanation">Laravel calls <code>register()</code> on every service provider first (this is where you bind things into the container). Only after ALL providers are registered does it call <code>boot()</code> on each. This ensures all bindings are available during boot.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <h4>9. Which PHP function should you use for password hashing?</h4>
+      <label><input type="radio" name="pq9" value="a"> md5() or sha256()</label>
+      <label><input type="radio" name="pq9" value="b"> password_hash() with PASSWORD_BCRYPT or PASSWORD_ARGON2ID</label>
+      <label><input type="radio" name="pq9" value="c"> hash('sha512', $password)</label>
+      <label><input type="radio" name="pq9" value="d"> crypt() with a custom salt</label>
+      <div class="quiz-explanation"><code>password_hash()</code> is the only correct answer. It automatically generates a cryptographically secure salt. md5/sha256 are NOT suitable for passwords - they're fast hashing algorithms, making them vulnerable to brute force. Bcrypt/Argon2 are deliberately slow.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <h4>10. What does <code>readonly</code> mean on a PHP 8.2 class?</h4>
+      <label><input type="radio" name="pq10" value="a"> All properties are implicitly readonly - can only be set in the constructor</label>
+      <label><input type="radio" name="pq10" value="b"> The class cannot be extended</label>
+      <label><input type="radio" name="pq10" value="c"> The class can only have public properties</label>
+      <label><input type="radio" name="pq10" value="d"> The class is automatically cached in OPcache</label>
+      <div class="quiz-explanation">A <code>readonly class</code> in PHP 8.2 makes all declared properties implicitly readonly. Each property can only be initialized once (typically in the constructor) and cannot be modified afterward. It's perfect for DTOs and value objects.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <h4>11. How does Laravel's Queue system handle failed jobs by default?</h4>
+      <label><input type="radio" name="pq11" value="a"> Silently discards them</label>
+      <label><input type="radio" name="pq11" value="b"> Retries indefinitely</label>
+      <label><input type="radio" name="pq11" value="c"> Stores them in the failed_jobs table after exceeding max tries</label>
+      <label><input type="radio" name="pq11" value="d"> Sends an email notification</label>
+      <div class="quiz-explanation">After exhausting all retry attempts, Laravel stores the failed job in the <code>failed_jobs</code> database table. You can retry them with <code>php artisan queue:retry</code>. The job's <code>failed()</code> method is called if defined, allowing custom failure handling.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <h4>12. What is the purpose of <code>DB::transaction()</code>?</h4>
+      <label><input type="radio" name="pq12" value="a"> To lock the database for exclusive access</label>
+      <label><input type="radio" name="pq12" value="b"> To cache query results</label>
+      <label><input type="radio" name="pq12" value="c"> To log all queries for debugging</label>
+      <label><input type="radio" name="pq12" value="d"> To ensure all queries succeed or all are rolled back (atomicity)</label>
+      <div class="quiz-explanation">Database transactions ensure atomicity - either ALL queries within the transaction succeed, or ALL are rolled back. This is critical for operations like creating an order + decrementing stock, where partial completion would leave data inconsistent.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <h4>13. What's the difference between <code>include</code> and <code>require</code> in PHP?</h4>
+      <label><input type="radio" name="pq13" value="a"> include is for classes, require is for functions</label>
+      <label><input type="radio" name="pq13" value="b"> include emits a warning on failure, require emits a fatal error</label>
+      <label><input type="radio" name="pq13" value="c"> require is faster than include</label>
+      <label><input type="radio" name="pq13" value="d"> There is no difference in PHP 8</label>
+      <div class="quiz-explanation"><code>include</code> emits an E_WARNING if the file is not found (script continues). <code>require</code> emits an E_COMPILE_ERROR / fatal error (script stops). The <code>_once</code> variants prevent loading the same file twice. In modern Laravel, autoloading via Composer eliminates most direct usage.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <h4>14. When should you use Laravel Events vs Observers?</h4>
+      <label><input type="radio" name="pq14" value="a"> Events for business logic with explicit dispatch; Observers for model-level lifecycle hooks</label>
+      <label><input type="radio" name="pq14" value="b"> Events for async; Observers for sync</label>
+      <label><input type="radio" name="pq14" value="c"> They are interchangeable - use whichever you prefer</label>
+      <label><input type="radio" name="pq14" value="d"> Events for single listeners; Observers for multiple listeners</label>
+      <div class="quiz-explanation">Events are explicit - you dispatch them deliberately for business-level actions (OrderPlaced, UserRegistered). Observers are implicit - they fire automatically on model lifecycle events (creating, created, updating, etc.). Observers are best for simple model concerns (generating UUIDs, clearing cache). Events are better for complex business logic because they're explicit and easier to trace.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <h4>15. What does <code>php artisan route:cache</code> do and when should you NOT use it?</h4>
+      <label><input type="radio" name="pq15" value="a"> It caches route results; don't use with dynamic routes</label>
+      <label><input type="radio" name="pq15" value="b"> It compiles routes to PHP; don't use in production</label>
+      <label><input type="radio" name="pq15" value="c"> It serializes routes for faster registration; don't use with closure-based routes</label>
+      <label><input type="radio" name="pq15" value="d"> It caches route middleware; don't use with API routes</label>
+      <div class="quiz-explanation">Route caching serializes all route definitions into a single file for faster registration. It dramatically improves boot time for apps with many routes. However, closure-based routes cannot be serialized, so you must use controller-based routes. This is only for production - clear cache during development.</div>
+    </div>
+  </div>
+
+  <div id="phpQuizResult" class="quiz-result" style="display:none"></div>
+  <button class="btn btn-primary" onclick="gradeQuiz('phpQuiz', 'phpQuizResult', 15)">Submit Quiz</button>
+  <button class="btn btn-outline" onclick="resetQuiz('phpQuiz', 'phpQuizResult')">Reset</button>
+</section>
+
+<!-- ==================== REACT QUIZ ==================== -->
+<section id="quiz-react">
+  <h2><span class="tag tag-react">Quiz</span> React - 10 Questions</h2>
+
+  <div class="quiz-container" id="reactQuiz">
+    <div class="quiz-q" data-correct="c">
+      <h4>1. What is the primary purpose of the key prop in React lists?</h4>
+      <label><input type="radio" name="rq1" value="a"> To improve CSS styling specificity</label>
+      <label><input type="radio" name="rq1" value="b"> To enable event delegation</label>
+      <label><input type="radio" name="rq1" value="c"> To help React identify which items changed, were added, or removed during reconciliation</label>
+      <label><input type="radio" name="rq1" value="d"> To ensure unique form field names</label>
+      <div class="quiz-explanation">Keys help React's reconciliation algorithm efficiently determine the minimal set of DOM changes when a list updates. Without stable keys, React may re-render more elements than necessary or lose component state during reordering.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <h4>2. When does useEffect cleanup function run?</h4>
+      <label><input type="radio" name="rq2" value="a"> Only when the component unmounts</label>
+      <label><input type="radio" name="rq2" value="b"> Before the next effect runs AND when the component unmounts</label>
+      <label><input type="radio" name="rq2" value="c"> Only when dependencies change</label>
+      <label><input type="radio" name="rq2" value="d"> Immediately after the effect runs</label>
+      <div class="quiz-explanation">The cleanup function runs before the effect re-runs (when dependencies change) AND when the component unmounts. This ensures resources from the previous effect are cleaned up before the next effect sets up new ones.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <h4>3. What is React Fiber?</h4>
+      <label><input type="radio" name="rq3" value="a"> A reimplementation of React's core algorithm enabling incremental rendering and prioritization</label>
+      <label><input type="radio" name="rq3" value="b"> A state management library built into React</label>
+      <label><input type="radio" name="rq3" value="c"> React's CSS-in-JS solution</label>
+      <label><input type="radio" name="rq3" value="d"> A testing framework for React components</label>
+      <div class="quiz-explanation">React Fiber (React 16+) is the reimplementation of React's reconciliation algorithm. It enables incremental rendering (splitting work into chunks), prioritization of updates (user input over data fetching), and is the foundation for features like Suspense and Concurrent Mode.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <h4>4. Why should you use functional updates with useState?</h4>
+      <label><input type="radio" name="rq4" value="a"> They're faster than direct updates</label>
+      <label><input type="radio" name="rq4" value="b"> They prevent re-renders</label>
+      <label><input type="radio" name="rq4" value="c"> They work with TypeScript better</label>
+      <label><input type="radio" name="rq4" value="d"> To ensure you're working with the latest state value, especially in closures and batched updates</label>
+      <div class="quiz-explanation"><code>setCount(prev => prev + 1)</code> guarantees you're reading the latest state value. Without it, closures may capture stale state: <code>setCount(count + 1)</code> called multiple times in an event handler would only increment once because all calls see the same <code>count</code>.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <h4>5. When should you use useReducer instead of useState?</h4>
+      <label><input type="radio" name="rq5" value="a"> Always - it's the preferred approach</label>
+      <label><input type="radio" name="rq5" value="b"> When state transitions are complex, involve multiple sub-values, or next state depends on previous state</label>
+      <label><input type="radio" name="rq5" value="c"> Only for global state management</label>
+      <label><input type="radio" name="rq5" value="d"> When you need asynchronous state updates</label>
+      <div class="quiz-explanation">useReducer shines when: state has many sub-values that update together, transitions follow complex rules, you want testable state logic (pure reducer function), or you need to pass dispatch down instead of multiple setter callbacks.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <h4>6. What is the difference between useMemo and useCallback?</h4>
+      <label><input type="radio" name="rq6" value="a"> useMemo is for objects, useCallback is for arrays</label>
+      <label><input type="radio" name="rq6" value="b"> useMemo is synchronous, useCallback is asynchronous</label>
+      <label><input type="radio" name="rq6" value="c"> useMemo memoizes a computed value, useCallback memoizes a function reference</label>
+      <label><input type="radio" name="rq6" value="d"> They are identical - useCallback is just an alias</label>
+      <div class="quiz-explanation"><code>useMemo(() => computeValue(), [deps])</code> caches the return value. <code>useCallback(fn, [deps])</code> caches the function itself. Technically, <code>useCallback(fn, deps)</code> is equivalent to <code>useMemo(() => fn, deps)</code>. Both prevent unnecessary re-renders when passed as props to memoized children.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <h4>7. Why can't Error Boundaries be implemented as function components?</h4>
+      <label><input type="radio" name="rq7" value="a"> There are no hook equivalents for getDerivedStateFromError and componentDidCatch</label>
+      <label><input type="radio" name="rq7" value="b"> Function components can't handle errors</label>
+      <label><input type="radio" name="rq7" value="c"> They were intentionally restricted to class components for performance</label>
+      <label><input type="radio" name="rq7" value="d"> Function components don't have a render method</label>
+      <div class="quiz-explanation">React has not yet introduced hook equivalents for the error boundary lifecycle methods (<code>getDerivedStateFromError</code> and <code>componentDidCatch</code>). This is one of the few remaining reasons to use class components. Libraries like react-error-boundary provide a wrapper for easier usage.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <h4>8. What does React.memo do?</h4>
+      <label><input type="radio" name="rq8" value="a"> Memoizes the component's state</label>
+      <label><input type="radio" name="rq8" value="b"> Caches the component's DOM output</label>
+      <label><input type="radio" name="rq8" value="c"> Prevents the component from ever re-rendering</label>
+      <label><input type="radio" name="rq8" value="d"> Skips re-rendering if props haven't changed (shallow comparison)</label>
+      <div class="quiz-explanation"><code>React.memo</code> is a higher-order component that performs a shallow comparison of props. If props are the same, it skips re-rendering and reuses the last rendered result. You can provide a custom comparison function for more control.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <h4>9. What problem does the Context API solve, and what is its limitation?</h4>
+      <label><input type="radio" name="rq9" value="a"> It replaces Redux; no limitations</label>
+      <label><input type="radio" name="rq9" value="b"> It solves prop drilling; but all consumers re-render when context value changes</label>
+      <label><input type="radio" name="rq9" value="c"> It provides type safety; limited to string values</label>
+      <label><input type="radio" name="rq9" value="d"> It handles async data; limited to synchronous updates</label>
+      <div class="quiz-explanation">Context eliminates prop drilling by providing values to deeply nested components. However, when the context value changes, ALL consumers re-render, even if they only use part of the value. Mitigation: split contexts by update frequency, memoize the value object, or use state management libraries for frequently changing state.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <h4>10. In React 18, what does Automatic Batching mean?</h4>
+      <label><input type="radio" name="rq10" value="a"> React automatically bundles component files</label>
+      <label><input type="radio" name="rq10" value="b"> React batches API calls</label>
+      <label><input type="radio" name="rq10" value="c"> Multiple state updates in any context (events, promises, timeouts) result in a single re-render</label>
+      <label><input type="radio" name="rq10" value="d"> React automatically splits code into chunks</label>
+      <div class="quiz-explanation">Before React 18, batching only happened in React event handlers. In React 18, state updates are batched everywhere - inside promises, setTimeout, native event handlers, etc. This means fewer re-renders and better performance by default. Use <code>flushSync()</code> if you need to opt out.</div>
+    </div>
+  </div>
+
+  <div id="reactQuizResult" class="quiz-result" style="display:none"></div>
+  <button class="btn btn-primary" onclick="gradeQuiz('reactQuiz', 'reactQuizResult', 10)">Submit Quiz</button>
+  <button class="btn btn-outline" onclick="resetQuiz('reactQuiz', 'reactQuizResult')">Reset</button>
+</section>
+
+<!-- ==================== VUE QUIZ ==================== -->
+<section id="quiz-vue">
+  <h2><span class="tag tag-vue">Quiz</span> Vue - 10 Questions</h2>
+
+  <div class="quiz-container" id="vueQuiz">
+    <div class="quiz-q" data-correct="b">
+      <h4>1. What is the main advantage of Vue 3's Composition API over the Options API?</h4>
+      <label><input type="radio" name="vq1" value="a"> Better performance</label>
+      <label><input type="radio" name="vq1" value="b"> Better logic organization and reusability through composables</label>
+      <label><input type="radio" name="vq1" value="c"> Smaller bundle size</label>
+      <label><input type="radio" name="vq1" value="d"> Built-in TypeScript support</label>
+      <div class="quiz-explanation">The Composition API lets you organize code by logical concern (all user-related logic together) rather than by option type (all data together, all methods together). Composables enable clean logic extraction and reuse across components - similar to React's custom hooks.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <h4>2. What happens if you destructure a reactive() object in Vue 3?</h4>
+      <label><input type="radio" name="vq2" value="a"> It works fine, reactivity is preserved</label>
+      <label><input type="radio" name="vq2" value="b"> It throws an error</label>
+      <label><input type="radio" name="vq2" value="c"> The destructured values lose reactivity</label>
+      <label><input type="radio" name="vq2" value="d"> It creates a shallow copy</label>
+      <div class="quiz-explanation">Destructuring a <code>reactive()</code> object creates plain (non-reactive) variables. Use <code>toRefs()</code> to destructure while maintaining reactivity: <code>const { name, email } = toRefs(state)</code>. This is a common gotcha in Vue 3.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <h4>3. What is the difference between watch and watchEffect in Vue 3?</h4>
+      <label><input type="radio" name="vq3" value="a"> watch requires explicit sources and gives old/new values; watchEffect auto-tracks dependencies</label>
+      <label><input type="radio" name="vq3" value="b"> watchEffect is async, watch is sync</label>
+      <label><input type="radio" name="vq3" value="c"> watch is for refs, watchEffect is for reactive objects</label>
+      <label><input type="radio" name="vq3" value="d"> They are identical in behavior</label>
+      <div class="quiz-explanation"><code>watch</code> takes explicit source(s) and a callback with old/new values - similar to watching specific variables. <code>watchEffect</code> runs immediately and auto-tracks any reactive dependency accessed inside it - similar to React's useEffect but with automatic dependency detection.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <h4>4. Why is Pinia recommended over Vuex for Vue 3?</h4>
+      <label><input type="radio" name="vq4" value="a"> Pinia is faster</label>
+      <label><input type="radio" name="vq4" value="b"> Vuex doesn't work with Vue 3</label>
+      <label><input type="radio" name="vq4" value="c"> Pinia has more features</label>
+      <label><input type="radio" name="vq4" value="d"> No mutations needed, better TypeScript support, smaller bundle, simpler API</label>
+      <div class="quiz-explanation">Pinia removes the mutations layer (direct state changes), has first-class TypeScript support, is ~1.5KB (vs ~6KB for Vuex), uses flat stores instead of nested modules, and supports the Composition API setup syntax. It's the officially recommended state management for Vue 3.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <h4>5. When should you use v-show instead of v-if?</h4>
+      <label><input type="radio" name="vq5" value="a"> When the element has event listeners</label>
+      <label><input type="radio" name="vq5" value="b"> When the visibility toggles frequently</label>
+      <label><input type="radio" name="vq5" value="c"> When the element is inside a v-for loop</label>
+      <label><input type="radio" name="vq5" value="d"> When you need animations</label>
+      <div class="quiz-explanation"><code>v-show</code> uses CSS display:none (element always in DOM), so toggling is cheap. <code>v-if</code> adds/removes from DOM, which is more expensive for frequent toggles. Use v-if for conditions that rarely change (lazy rendering), v-show for frequent toggles (tabs, dropdowns).</div>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <h4>6. What is hydration in the context of Vue SSR?</h4>
+      <label><input type="radio" name="vq6" value="a"> The process of making server-rendered HTML interactive by attaching Vue's reactivity and event listeners</label>
+      <label><input type="radio" name="vq6" value="b"> Pre-rendering components to static HTML</label>
+      <label><input type="radio" name="vq6" value="c"> Loading data from the server into Pinia stores</label>
+      <label><input type="radio" name="vq6" value="d"> Converting Vue components to Web Components</label>
+      <div class="quiz-explanation">Hydration takes server-rendered HTML (which is static and non-interactive) and "hydrates" it by attaching Vue's reactivity system and event listeners on the client. The HTML is visible immediately (fast FCP), then becomes interactive after hydration completes.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <h4>7. What does <code>&lt;script setup&gt;</code> provide in Vue 3.2+?</h4>
+      <label><input type="radio" name="vq7" value="a"> Server-side setup for SSR</label>
+      <label><input type="radio" name="vq7" value="b"> A replacement for the created() lifecycle hook</label>
+      <label><input type="radio" name="vq7" value="c"> A compile-time syntax sugar that auto-exposes all top-level bindings to the template</label>
+      <label><input type="radio" name="vq7" value="d"> A way to define global setup functions</label>
+      <div class="quiz-explanation"><code>&lt;script setup&gt;</code> is a compile-time sugar for the Composition API. Variables, functions, and imports declared at the top level are automatically available in the template - no explicit <code>return</code> needed. It also enables better TypeScript inference and slightly better runtime performance.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <h4>8. What is the purpose of <code>keep-alive</code> in Vue?</h4>
+      <label><input type="radio" name="vq8" value="a"> To prevent component re-rendering</label>
+      <label><input type="radio" name="vq8" value="b"> To maintain WebSocket connections</label>
+      <label><input type="radio" name="vq8" value="c"> To cache API responses</label>
+      <label><input type="radio" name="vq8" value="d"> To cache component instances and preserve their state when switching between them</label>
+      <div class="quiz-explanation"><code>&lt;keep-alive&gt;</code> caches inactive component instances instead of destroying them. When the user switches back, the component's state (form data, scroll position, etc.) is preserved. Use <code>include</code>/<code>exclude</code> props to control which components are cached. Cached components get <code>onActivated</code>/<code>onDeactivated</code> lifecycle hooks.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <h4>9. How does Vue 3's reactivity system work under the hood?</h4>
+      <label><input type="radio" name="vq9" value="a"> Object.defineProperty for property interception</label>
+      <label><input type="radio" name="vq9" value="b"> JavaScript Proxy for reactive objects, getter/setter for refs</label>
+      <label><input type="radio" name="vq9" value="c"> MutationObserver for DOM changes</label>
+      <label><input type="radio" name="vq9" value="d"> Virtual DOM diffing</label>
+      <div class="quiz-explanation">Vue 3 uses JavaScript Proxy (replacing Vue 2's Object.defineProperty). Proxy can intercept ALL operations on an object (including property addition/deletion, which Vue 2 couldn't detect). <code>ref()</code> wraps the value in an object with getter/setter. This is why <code>ref</code> needs <code>.value</code> - the getter/setter triggers dependency tracking.</div>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <h4>10. What is the difference between <code>router.push()</code> and <code>router.replace()</code>?</h4>
+      <label><input type="radio" name="vq10" value="a"> push adds to history stack (back button works); replace replaces current entry (no back)</label>
+      <label><input type="radio" name="vq10" value="b"> push is async, replace is sync</label>
+      <label><input type="radio" name="vq10" value="c"> push triggers beforeRouteEnter, replace doesn't</label>
+      <label><input type="radio" name="vq10" value="d"> push works with named routes, replace only with paths</label>
+      <div class="quiz-explanation"><code>router.push()</code> adds a new entry to the browser history stack - the user can press Back to return. <code>router.replace()</code> replaces the current history entry - the user can't go back. Use replace for redirects (e.g., after login, redirect to dashboard without login page in history).</div>
+    </div>
+  </div>
+
+  <div id="vueQuizResult" class="quiz-result" style="display:none"></div>
+  <button class="btn btn-primary" onclick="gradeQuiz('vueQuiz', 'vueQuizResult', 10)">Submit Quiz</button>
+  <button class="btn btn-outline" onclick="resetQuiz('vueQuiz', 'vueQuizResult')">Reset</button>
+</section>
+
+<!-- ==================== CODING CHALLENGES ==================== -->
+<section id="challenges">
+  <h2><span class="tag tag-senior">Practice</span> Coding Challenges</h2>
+  <p>These simulate Lemon.io's Coderbyte-style challenges. Write real code, not pseudocode. Focus on clean, production-quality solutions.</p>
+
+  <div class="challenge" id="ch1">
+    <h3>Challenge 1: Laravel - Repository with Caching <span class="tag tag-laravel">Laravel</span></h3>
+    <p>Implement a <code>CachedProductRepository</code> that wraps an <code>EloquentProductRepository</code> with Redis caching. It should cache <code>findById</code> results and invalidate cache on <code>update</code> and <code>delete</code>.</p>
+    <textarea id="code1" placeholder="<?php
+
+interface ProductRepository {
+    public function findById(int $id): ?Product;
+    public function update(int $id, array $data): Product;
+    public function delete(int $id): bool;
+}
+
+// Implement CachedProductRepository here..."></textarea>
+    <div style="margin-top:.75rem;display:flex;gap:.5rem;align-items:center">
+      <button class="btn btn-primary" onclick="checkChallenge(1)">Check Solution</button>
+      <button class="btn btn-outline" onclick="toggleHint(1)">Show Hint</button>
+      <button class="btn btn-outline" onclick="toggleSolution(1)">Show Solution</button>
+    </div>
+    <div class="challenge-feedback" id="fb1"></div>
+    <div class="accordion" id="hint1" style="display:none">
+      <div class="accordion-item open"><div class="accordion-body">
+        <strong>Hint:</strong> Use the Decorator pattern - CachedProductRepository implements ProductRepository and wraps EloquentProductRepository. Use <code>Cache::remember()</code> for reads and <code>Cache::forget()</code> for cache invalidation on writes.
+      </div></div>
+    </div>
+    <div class="accordion" id="sol1" style="display:none">
+      <div class="accordion-item open"><div class="accordion-body">
+        <pre><code>class CachedProductRepository implements ProductRepository
+{
+    public function __construct(
+        private EloquentProductRepository $repository,
+        private int $ttl = 3600,
+    ) {}
+
+    public function findById(int $id): ?Product
+    {
+        return Cache::remember(
+            "product:{$id}",
+            $this->ttl,
+            fn() => $this->repository->findById($id)
+        );
+    }
+
+    public function update(int $id, array $data): Product
+    {
+        $product = $this->repository->update($id, $data);
+        Cache::forget("product:{$id}");
+        return $product;
+    }
+
+    public function delete(int $id): bool
+    {
+        $result = $this->repository->delete($id);
+        Cache::forget("product:{$id}");
+        return $result;
+    }
+}
+
+// Service Provider binding:
+$this->app->bind(ProductRepository::class, function ($app) {
+    return new CachedProductRepository(
+        new EloquentProductRepository(new Product()),
+    );
+});</code></pre>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="challenge" id="ch2">
+    <h3>Challenge 2: React - Custom Hook with Debounce <span class="tag tag-react">React</span></h3>
+    <p>Create a <code>useSearchUsers</code> custom hook that fetches users from <code>/api/users?q=query</code> with 300ms debounce, loading state, error handling, and request cancellation on unmount.</p>
+    <textarea id="code2" placeholder="// Implement useSearchUsers hook
+function useSearchUsers(query) {
+  // Return { users, loading, error }
+}"></textarea>
+    <div style="margin-top:.75rem;display:flex;gap:.5rem;align-items:center">
+      <button class="btn btn-primary" onclick="checkChallenge(2)">Check Solution</button>
+      <button class="btn btn-outline" onclick="toggleHint(2)">Show Hint</button>
+      <button class="btn btn-outline" onclick="toggleSolution(2)">Show Solution</button>
+    </div>
+    <div class="challenge-feedback" id="fb2"></div>
+    <div class="accordion" id="hint2" style="display:none">
+      <div class="accordion-item open"><div class="accordion-body">
+        <strong>Hint:</strong> Use useState for users/loading/error, useEffect with setTimeout for debounce, AbortController for request cancellation. The cleanup function should clear the timeout AND abort the fetch.
+      </div></div>
+    </div>
+    <div class="accordion" id="sol2" style="display:none">
+      <div class="accordion-item open"><div class="accordion-body">
+        <pre><code>function useSearchUsers(query) {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setUsers([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/users?q=${encodeURIComponent(query)}`,
+          { signal: controller.signal }
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setUsers(data);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [query]);
+
+  return { users, loading, error };
+}</code></pre>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="challenge" id="ch3">
+    <h3>Challenge 3: Vue - Composable with Pagination <span class="tag tag-vue">Vue</span></h3>
+    <p>Create a <code>usePagination</code> composable that handles paginated API requests with reactive page state, loading, and methods to go to next/prev/specific page.</p>
+    <textarea id="code3" placeholder="// Implement usePagination composable
+export function usePagination(fetchFn, perPage = 15) {
+  // Return { data, page, totalPages, loading, next, prev, goTo }
+}"></textarea>
+    <div style="margin-top:.75rem;display:flex;gap:.5rem;align-items:center">
+      <button class="btn btn-primary" onclick="checkChallenge(3)">Check Solution</button>
+      <button class="btn btn-outline" onclick="toggleHint(3)">Show Hint</button>
+      <button class="btn btn-outline" onclick="toggleSolution(3)">Show Solution</button>
+    </div>
+    <div class="challenge-feedback" id="fb3"></div>
+    <div class="accordion" id="hint3" style="display:none">
+      <div class="accordion-item open"><div class="accordion-body">
+        <strong>Hint:</strong> Use ref for page, data, totalPages, loading. Use watch on page to trigger fetchFn. Return navigation methods (next, prev, goTo) that update the page ref. The watcher handles the actual fetching.
+      </div></div>
+    </div>
+    <div class="accordion" id="sol3" style="display:none">
+      <div class="accordion-item open"><div class="accordion-body">
+        <pre><code>import { ref, watch } from 'vue';
+
+export function usePagination(fetchFn, perPage = 15) {
+  const data = ref([]);
+  const page = ref(1);
+  const totalPages = ref(1);
+  const loading = ref(false);
+  const error = ref(null);
+
+  async function load() {
+    loading.value = true;
+    error.value = null;
+    try {
+      const result = await fetchFn(page.value, perPage);
+      data.value = result.data;
+      totalPages.value = result.last_page;
+    } catch (err) {
+      error.value = err.message;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  watch(page, load, { immediate: true });
+
+  function next() {
+    if (page.value < totalPages.value) page.value++;
+  }
+
+  function prev() {
+    if (page.value > 1) page.value--;
+  }
+
+  function goTo(p) {
+    if (p >= 1 && p <= totalPages.value) page.value = p;
+  }
+
+  return { data, page, totalPages, loading, error, next, prev, goTo, refresh: load };
+}</code></pre>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="challenge" id="ch4">
+    <h3>Challenge 4: Laravel - Middleware Rate Limiter <span class="tag tag-laravel">Laravel</span></h3>
+    <p>Create a custom middleware that rate-limits API endpoints to 60 requests per minute per user (authenticated) or per IP (guest). Return appropriate headers (X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After).</p>
+    <textarea id="code4" placeholder="<?php
+
+class ApiRateLimiter
+{
+    public function handle(Request $request, Closure $next, int $maxAttempts = 60)
+    {
+        // Implement rate limiting logic here
+    }
+}"></textarea>
+    <div style="margin-top:.75rem;display:flex;gap:.5rem;align-items:center">
+      <button class="btn btn-primary" onclick="checkChallenge(4)">Check Solution</button>
+      <button class="btn btn-outline" onclick="toggleHint(4)">Show Hint</button>
+      <button class="btn btn-outline" onclick="toggleSolution(4)">Show Solution</button>
+    </div>
+    <div class="challenge-feedback" id="fb4"></div>
+    <div class="accordion" id="hint4" style="display:none">
+      <div class="accordion-item open"><div class="accordion-body">
+        <strong>Hint:</strong> Use Laravel's <code>RateLimiter</code> facade. Generate a unique key from user ID or IP. Use <code>RateLimiter::tooManyAttempts()</code> to check, <code>RateLimiter::hit()</code> to increment, and <code>RateLimiter::availableIn()</code> for Retry-After.
+      </div></div>
+    </div>
+    <div class="accordion" id="sol4" style="display:none">
+      <div class="accordion-item open"><div class="accordion-body">
+        <pre><code>class ApiRateLimiter
+{
+    public function handle(Request $request, Closure $next, int $maxAttempts = 60)
+    {
+        $key = $this->resolveKey($request);
+
+        if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+            $retryAfter = RateLimiter::availableIn($key);
+
+            return response()->json([
+                'message' => 'Too many requests.',
+                'retry_after' => $retryAfter,
+            ], 429)->withHeaders([
+                'Retry-After' => $retryAfter,
+                'X-RateLimit-Limit' => $maxAttempts,
+                'X-RateLimit-Remaining' => 0,
+            ]);
+        }
+
+        RateLimiter::hit($key, 60); // Decay in 60 seconds
+
+        $response = $next($request);
+
+        return $response->withHeaders([
+            'X-RateLimit-Limit' => $maxAttempts,
+            'X-RateLimit-Remaining' => RateLimiter::remaining($key, $maxAttempts),
+        ]);
+    }
+
+    private function resolveKey(Request $request): string
+    {
+        return $request->user()
+            ? 'api:user:' . $request->user()->id
+            : 'api:ip:' . $request->ip();
+    }
+}</code></pre>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== MOCK INTERVIEW ==================== -->
+<section id="mock-interview">
+  <h2><span class="tag tag-senior">Practice</span> Mock Interview Q&A</h2>
+  <p>These are the type of questions Lemon.io asks. Click "Show Senior Answer" to see how a senior developer should respond. Practice answering BEFORE looking!</p>
+
+  <div class="qa-item">
+    <div class="question">1. Explain how Laravel's Service Container works and why it matters.</div>
+    <button class="reveal-btn" onclick="this.parentElement.classList.toggle('revealed')">Show Senior Answer</button>
+    <div class="answer">
+      <p><strong>Senior Answer:</strong> "The Service Container is Laravel's implementation of an IoC (Inversion of Control) container. It's essentially a registry that knows how to create objects and their dependencies. When you type-hint an interface in a controller constructor, the container automatically resolves the correct implementation and injects it.</p>
+      <p>Why it matters: It decouples your code from specific implementations. I can bind <code>PaymentGateway::class</code> to <code>StripeGateway</code> in production and <code>FakeGateway</code> in tests - the controller code never changes. This makes testing trivial and swapping implementations painless.</p>
+      <p>In practice, I use it for: binding interfaces to implementations, creating singletons for expensive objects (like API clients), contextual binding when different classes need different implementations of the same interface, and scoped bindings for request-lifecycle objects in Laravel Octane."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="question">2. You have a Laravel API endpoint that's responding slowly (3+ seconds). How do you diagnose and fix it?</div>
+    <button class="reveal-btn" onclick="this.parentElement.classList.toggle('revealed')">Show Senior Answer</button>
+    <div class="answer">
+      <p><strong>Senior Answer:</strong> "First, I'd identify WHERE the bottleneck is, not guess:</p>
+      <ol>
+        <li><strong>Laravel Telescope/Debugbar</strong> - Check query count and time. N+1 queries are the #1 culprit. If I see 200 queries, that's my answer.</li>
+        <li><strong>If it's queries:</strong> Add eager loading (with()), add database indexes, use select() to limit columns, consider query caching with Redis.</li>
+        <li><strong>If it's external API calls:</strong> Move to a queued job. The user gets an immediate response, and the API call happens in the background.</li>
+        <li><strong>If it's computation:</strong> Cache the result with Cache::remember(), or compute it in a scheduled job and cache the result.</li>
+        <li><strong>If it's serialization:</strong> Large collections being transformed through API Resources can be slow. Use cursor pagination or limit fields.</li>
+      </ol>
+      <p>I always profile before optimizing. I've seen teams add Redis caching to an endpoint when the actual problem was a missing database index."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="question">3. Explain the difference between React's useMemo, useCallback, and React.memo. When would you use each?</div>
+    <button class="reveal-btn" onclick="this.parentElement.classList.toggle('revealed')">Show Senior Answer</button>
+    <div class="answer">
+      <p><strong>Senior Answer:</strong> "They're all memoization tools but at different levels:</p>
+      <ul>
+        <li><code>useMemo</code> - Memoizes a computed VALUE. Use it when you have an expensive calculation that shouldn't re-run on every render. Like sorting a 10K item list - you only want to re-sort when the list or sort criteria changes.</li>
+        <li><code>useCallback</code> - Memoizes a FUNCTION reference. Use it when passing callbacks to memoized children - without it, a new function reference is created every render, defeating React.memo on the child.</li>
+        <li><code>React.memo</code> - Memoizes a COMPONENT. It does a shallow prop comparison and skips re-rendering if props haven't changed.</li>
+      </ul>
+      <p>The key insight: these only matter when they prevent actual re-renders. I see developers wrap everything in useMemo/useCallback - that's premature optimization that adds complexity without benefit. I use them when profiling shows a performance problem, or when passing to a React.memo child. The React DevTools profiler is my first step."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="question">4. How would you design the authentication system for a React SPA + Laravel API?</div>
+    <button class="reveal-btn" onclick="this.parentElement.classList.toggle('revealed')">Show Senior Answer</button>
+    <div class="answer">
+      <p><strong>Senior Answer:</strong> "It depends on the deployment topology:</p>
+      <p><strong>Same domain (SPA + API):</strong> I'd use Laravel Sanctum's SPA authentication. The flow is: SPA calls <code>/sanctum/csrf-cookie</code> to get an XSRF token, then sends login credentials. Laravel sets an httpOnly session cookie. All subsequent requests include the cookie automatically. No token management in the frontend. This is the most secure approach because tokens aren't stored in localStorage (XSS-vulnerable).</p>
+      <p><strong>Different domains / Mobile:</strong> I'd use Sanctum token authentication. After login, generate a personal access token, return it to the client, store it in memory (not localStorage). Send it as a Bearer token in the Authorization header. Implement token rotation - issue a new token periodically and revoke old ones.</p>
+      <p>In both cases: use HTTPS only, implement rate limiting on auth endpoints, add 2FA for sensitive accounts, and use Laravel's built-in password hashing (bcrypt/argon2). I'd never roll my own auth - the attack surface is too large."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="question">5. What's the difference between Vue's ref() and reactive()? When do you use each?</div>
+    <button class="reveal-btn" onclick="this.parentElement.classList.toggle('revealed')">Show Senior Answer</button>
+    <div class="answer">
+      <p><strong>Senior Answer:</strong> "<code>ref()</code> wraps any value in a reactive object with a <code>.value</code> property. <code>reactive()</code> makes an object itself reactive using JavaScript Proxy.</p>
+      <p>I generally prefer <code>ref()</code> for several reasons:</p>
+      <ol>
+        <li>It works consistently with both primitives and objects</li>
+        <li>You can destructure and pass refs around without losing reactivity</li>
+        <li>The explicit <code>.value</code> makes it clear in code that you're dealing with reactive data</li>
+        <li><code>reactive()</code> has a gotcha - destructuring loses reactivity unless you use <code>toRefs()</code></li>
+      </ol>
+      <p>I use <code>reactive()</code> when I have a group of related values I'll always access together - like a form state object where I never need to pass individual fields around. But if there's any chance I'll need to destructure or pass individual values, I use <code>ref()</code>."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="question">6. Tell me about a time you had to make a difficult architectural decision. What trade-offs did you consider?</div>
+    <button class="reveal-btn" onclick="this.parentElement.classList.toggle('revealed')">Show Senior Answer</button>
+    <div class="answer">
+      <p><strong>Framework for answering:</strong> This is a behavioral question. Use the STAR method (Situation, Task, Action, Result) and focus on trade-offs.</p>
+      <p><strong>Example:</strong> "We had a growing Laravel monolith serving 500K daily requests. The team debated microservices. I advocated for the 'modular monolith' approach instead - extracting code into well-defined modules with clear interfaces, but keeping them in one deployable.</p>
+      <p><strong>Trade-offs I considered:</strong></p>
+      <ul>
+        <li>Microservices would give us independent deployment but add massive operational complexity (service mesh, distributed tracing, eventual consistency) - we had 4 developers, not 40</li>
+        <li>The modular monolith gave us 80% of the boundary benefits with 20% of the complexity</li>
+        <li>We could extract a module into a service later IF it actually needed independent scaling</li>
+      </ul>
+      <p>Result: Faster development velocity, clearer code boundaries, and when we eventually did extract the notification service (it had different scaling needs), the clean interfaces made it straightforward."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="question">7. How do you handle database migrations in a zero-downtime deployment?</div>
+    <button class="reveal-btn" onclick="this.parentElement.classList.toggle('revealed')">Show Senior Answer</button>
+    <div class="answer">
+      <p><strong>Senior Answer:</strong> "The key principle is: never make a breaking schema change in a single deployment.</p>
+      <p>For adding a column: Add it as nullable first, deploy new code that writes to it, backfill existing rows in batches, then add the NOT NULL constraint in a separate migration.</p>
+      <p>For removing a column: Stop reading from it in code first, deploy. Then remove it in a subsequent migration.</p>
+      <p>For renaming: Create the new column, deploy code that writes to both, backfill, deploy code that reads from new column, then drop old column.</p>
+      <p>For large table alterations (millions of rows): Use pt-online-schema-change or gh-ost which create a shadow table, copy data in chunks, then do an atomic rename. Never ALTER TABLE directly on a hot table.</p>
+      <p>I also always ensure migrations are idempotent and reversible. The <code>down()</code> method should actually work."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="question">8. Explain the concept of React Server Components and how they differ from SSR.</div>
+    <button class="reveal-btn" onclick="this.parentElement.classList.toggle('revealed')">Show Senior Answer</button>
+    <div class="answer">
+      <p><strong>Senior Answer:</strong> "Traditional SSR renders the entire component tree to HTML on the server, sends it to the client, then hydrates everything (making it interactive). The full JS bundle is still sent.</p>
+      <p>React Server Components (RSC) are fundamentally different: they run ONLY on the server and send their rendered output (not their code) to the client. The JS for Server Components is never shipped to the browser.</p>
+      <p>Key differences:</p>
+      <ul>
+        <li><strong>SSR</strong>: Server renders to HTML, client re-renders and hydrates. All component code is in the bundle.</li>
+        <li><strong>RSC</strong>: Server Components stay on the server. Only Client Components (marked with 'use client') are in the bundle.</li>
+        <li>RSC can directly access databases, file systems, and server-only APIs without an API layer</li>
+        <li>They're composable with Client Components - you can pass Server Component output as children to Client Components</li>
+      </ul>
+      <p>The practical benefit: dramatically smaller client bundles. A data table component that fetches from a DB and renders 10K rows? Zero KB of client JS if it's a Server Component."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="question">9. How do you ensure code quality in a team setting?</div>
+    <button class="reveal-btn" onclick="this.parentElement.classList.toggle('revealed')">Show Senior Answer</button>
+    <div class="answer">
+      <p><strong>Senior Answer:</strong> "I believe in automation over convention. My approach:</p>
+      <ol>
+        <li><strong>Automated standards:</strong> ESLint/Prettier for JS, PHP-CS-Fixer/Pint for PHP, configured in CI. No debates about formatting.</li>
+        <li><strong>Static analysis:</strong> PHPStan/Larastan at level 6+ for PHP, TypeScript strict mode for frontend. Catches bugs before runtime.</li>
+        <li><strong>Testing pipeline:</strong> Unit tests for business logic, integration tests for API endpoints, E2E tests for critical user flows. CI blocks merge if tests fail.</li>
+        <li><strong>Code review:</strong> I review for architecture and logic, not style (that's automated). I look for: does this solve the right problem? Is it maintainable? Are there edge cases?</li>
+        <li><strong>PR standards:</strong> Small, focused PRs with descriptions. One PR = one concern. Large PRs get stale and get rubber-stamped.</li>
+      </ol>
+      <p>The goal is to make quality the path of least resistance, not something that requires discipline."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="question">10. What's the biggest mistake you've made as a developer, and what did you learn?</div>
+    <button class="reveal-btn" onclick="this.parentElement.classList.toggle('revealed')">Show Senior Answer</button>
+    <div class="answer">
+      <p><strong>Tips for answering:</strong></p>
+      <ul>
+        <li>Choose a real mistake, not a humble-brag ("I work too hard")</li>
+        <li>Show accountability - don't blame others</li>
+        <li>Focus 70% on what you learned and changed, 30% on the mistake</li>
+        <li>Show how you prevented it from happening again (process change, not just "I'll be more careful")</li>
+      </ul>
+      <p><strong>Example:</strong> "I once deployed a database migration to production that added a NOT NULL column to a 20M row table without a default. It locked the table for 8 minutes during peak traffic. I learned to always: test migrations against production-size data, use the expand/contract migration pattern, and have a rollback plan before deploying any migration. I wrote a team runbook for safe migrations that we still use."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== RESOURCES ==================== -->
+<section id="resources">
+  <h2><span class="tag tag-senior">Resources</span> Learning Resources & Final Tips</h2>
+
+  <h3>Top Resources by Technology</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4 style="color:var(--php)">PHP</h4>
+      <ul>
+        <li><a href="https://www.php.net/manual/en/migration83.php" target="_blank">PHP 8.x Migration Guides</a> (official)</li>
+        <li><a href="https://phptherightway.com" target="_blank">PHP The Right Way</a></li>
+        <li><a href="https://php.watch" target="_blank">PHP.Watch</a> - Latest PHP features explained</li>
+        <li><a href="https://lemon.io/interview-questions/php/" target="_blank">Lemon.io PHP Questions</a></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--laravel)">Laravel</h4>
+      <ul>
+        <li><a href="https://laravel.com/docs" target="_blank">Official Laravel Docs</a></li>
+        <li><a href="https://laracasts.com" target="_blank">Laracasts</a> - Video tutorials</li>
+        <li><a href="https://laravel-news.com" target="_blank">Laravel News</a></li>
+        <li><a href="https://lemon.io/interview-questions/laravel/" target="_blank">Lemon.io Laravel Questions</a></li>
+        <li><a href="https://spatie.be/guidelines/laravel-php" target="_blank">Spatie Laravel Guidelines</a></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--react)">React</h4>
+      <ul>
+        <li><a href="https://react.dev" target="_blank">Official React Docs</a> (new)</li>
+        <li><a href="https://react.dev/learn" target="_blank">React Learn</a> - Interactive tutorials</li>
+        <li><a href="https://lemon.io/interview-questions/react-js/" target="_blank">Lemon.io React Questions</a></li>
+        <li><a href="https://kentcdodds.com/blog" target="_blank">Kent C. Dodds Blog</a></li>
+        <li><a href="https://overreacted.io" target="_blank">Overreacted</a> (Dan Abramov's blog)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--vue)">Vue</h4>
+      <ul>
+        <li><a href="https://vuejs.org/guide" target="_blank">Official Vue 3 Guide</a></li>
+        <li><a href="https://pinia.vuejs.org" target="_blank">Pinia Docs</a></li>
+        <li><a href="https://router.vuejs.org" target="_blank">Vue Router Docs</a></li>
+        <li><a href="https://lemon.io/interview-questions/vue/" target="_blank">Lemon.io Vue Questions</a></li>
+        <li><a href="https://vueschool.io" target="_blank">Vue School</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Interview Day Checklist</h3>
+  <div class="card">
+    <ul class="checklist">
+      <li><strong>Before:</strong> Test your mic, camera, and internet. Have a backup connection ready.</li>
+      <li><strong>Environment:</strong> Quiet room, good lighting, clean background.</li>
+      <li><strong>Browser:</strong> Have PHP/Laravel docs, React docs, Vue docs open in tabs (googling is allowed!).</li>
+      <li><strong>Coderbyte:</strong> Familiarize yourself with the platform beforehand.</li>
+      <li><strong>Mindset:</strong> It's a conversation, not an interrogation. Ask clarifying questions.</li>
+      <li><strong>Honesty:</strong> If you don't know, say "I'm not sure, but here's how I'd approach finding the answer..."</li>
+      <li><strong>Trade-offs:</strong> For every solution, discuss alternatives and why you chose this approach.</li>
+      <li><strong>Code quality:</strong> Write clean, named variables. Explain as you code. Handle errors.</li>
+      <li><strong>Questions for them:</strong> Prepare 2-3 thoughtful questions to ask at the end.</li>
+      <li><strong>Follow up:</strong> The interview is conversational. Engage, ask about their experience too.</li>
+    </ul>
+  </div>
+
+  <h3>Key Phrases That Show Senior Thinking</h3>
+  <div class="highlight-box success">
+    <ul>
+      <li>"It depends on the context. For a startup, I'd... For an enterprise, I'd..."</li>
+      <li>"The trade-off here is between X and Y. I'd choose X because..."</li>
+      <li>"I'd start simple and evolve. YAGNI - don't over-engineer upfront."</li>
+      <li>"Let me profile/measure before optimizing. Premature optimization is..."</li>
+      <li>"I've seen this pattern cause problems at scale because..."</li>
+      <li>"The business impact of this decision is..."</li>
+      <li>"I'd write a test for this because..."</li>
+    </ul>
+  </div>
+
+  <h3>Red Flags They Watch For</h3>
+  <div class="highlight-box danger">
+    <ul>
+      <li>Memorized answers without understanding (they'll probe deeper)</li>
+      <li>Not asking clarifying questions before jumping to solutions</li>
+      <li>"I've never seen that" without follow-up on how you'd figure it out</li>
+      <li>No mention of testing or error handling</li>
+      <li>Only knowing the "happy path" - not considering edge cases</li>
+      <li>Unable to explain WHY you'd choose one approach over another</li>
+      <li>Blaming tools/frameworks instead of understanding their trade-offs</li>
+    </ul>
+  </div>
+
+  <div class="highlight-box info" style="margin-top:2rem">
+    <h4 style="margin-top:0">Good luck! Remember:</h4>
+    <p style="margin-bottom:0">Lemon.io's 1.2% acceptance rate sounds scary, but 63% who reach the technical stage still fail - meaning most people aren't prepared. You're preparing. That already puts you ahead. Focus on understanding WHY things work, not just HOW. Be conversational, be honest about gaps, and show your thinking process. You've got this.</p>
+  </div>
+</section>
+
+</div><!-- /main -->
+
+<script>
+// NAVIGATION
+document.querySelectorAll('.sidebar a').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = link.dataset.section;
+
+    // Update active nav
+    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+    link.classList.add('active');
+
+    // Show section
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.getElementById(target).classList.add('active');
+
+    // Close mobile menu
+    document.querySelector('.sidebar').classList.remove('open');
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// ACCORDION
+document.querySelectorAll('.accordion-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    item.classList.toggle('open');
+  });
+});
+
+// QUIZ GRADING
+function gradeQuiz(quizId, resultId, total) {
+  const container = document.getElementById(quizId);
+  const questions = container.querySelectorAll('.quiz-q');
+  let correct = 0;
+
+  questions.forEach(q => {
+    const correctAnswer = q.dataset.correct;
+    const selected = q.querySelector('input:checked');
+    q.classList.add('answered');
+
+    if (selected && selected.value === correctAnswer) {
+      q.classList.add('correct');
+      q.classList.remove('wrong');
+      correct++;
+    } else {
+      q.classList.add('wrong');
+      q.classList.remove('correct');
+    }
+
+    // Disable inputs after grading
+    q.querySelectorAll('input').forEach(input => input.disabled = true);
+  });
+
+  const pct = Math.round((correct / total) * 100);
+  const resultEl = document.getElementById(resultId);
+  resultEl.style.display = 'block';
+  resultEl.className = 'quiz-result ' + (pct >= 70 ? 'pass' : 'fail');
+  resultEl.textContent = `${correct}/${total} correct (${pct}%) - ${pct >= 70 ? 'PASS' : 'NEEDS MORE STUDY'}`;
+}
+
+function resetQuiz(quizId, resultId) {
+  const container = document.getElementById(quizId);
+  container.querySelectorAll('.quiz-q').forEach(q => {
+    q.classList.remove('answered', 'correct', 'wrong');
+    q.querySelectorAll('input').forEach(input => {
+      input.checked = false;
+      input.disabled = false;
+    });
+  });
+  document.getElementById(resultId).style.display = 'none';
+}
+
+// CODING CHALLENGES
+const challengeChecks = {
+  1: [
+    { pattern: /implements\s+ProductRepository/i, label: 'Implements ProductRepository interface' },
+    { pattern: /Cache::remember|cache\(\)->remember/i, label: 'Uses Cache::remember for reads' },
+    { pattern: /Cache::forget|cache\(\)->forget/i, label: 'Invalidates cache on writes' },
+    { pattern: /constructor|__construct/i, label: 'Injects the wrapped repository' },
+  ],
+  2: [
+    { pattern: /useState/i, label: 'Uses useState for state management' },
+    { pattern: /useEffect/i, label: 'Uses useEffect for side effects' },
+    { pattern: /AbortController|abort/i, label: 'Handles request cancellation' },
+    { pattern: /setTimeout|debounce/i, label: 'Implements debounce' },
+    { pattern: /loading/i, label: 'Tracks loading state' },
+  ],
+  3: [
+    { pattern: /ref\(|reactive\(/i, label: 'Uses Vue reactivity (ref/reactive)' },
+    { pattern: /watch|watchEffect/i, label: 'Uses watchers for data fetching' },
+    { pattern: /page\.value|page\.value\+\+/i, label: 'Manages page state' },
+    { pattern: /next|prev/i, label: 'Has navigation methods' },
+  ],
+  4: [
+    { pattern: /tooManyAttempts|RateLimiter/i, label: 'Uses rate limit checking' },
+    { pattern: /429|Too many/i, label: 'Returns 429 status code' },
+    { pattern: /Retry-After|X-RateLimit/i, label: 'Includes rate limit headers' },
+    { pattern: /user\(\)|ip\(\)/i, label: 'Differentiates user vs IP limiting' },
+  ],
+};
+
+function checkChallenge(id) {
+  const code = document.getElementById('code' + id).value;
+  const checks = challengeChecks[id];
+  const fb = document.getElementById('fb' + id);
+
+  if (!code.trim()) {
+    fb.className = 'challenge-feedback show';
+    fb.style.background = 'rgba(239,68,68,.15)';
+    fb.style.color = '#ef4444';
+    fb.textContent = 'Write some code first!';
+    return;
+  }
+
+  let passed = 0;
+  let results = [];
+  checks.forEach(check => {
+    const match = check.pattern.test(code);
+    if (match) passed++;
+    results.push(`${match ? '>' : 'x'} ${check.label}`);
+  });
+
+  const pct = Math.round((passed / checks.length) * 100);
+  fb.className = 'challenge-feedback show';
+  fb.style.background = pct >= 75 ? 'rgba(34,197,94,.15)' : 'rgba(245,158,11,.15)';
+  fb.style.color = pct >= 75 ? '#22c55e' : '#f59e0b';
+  fb.innerHTML = `<strong>${passed}/${checks.length} checks passed (${pct}%)</strong><br>${results.join('<br>')}`;
+}
+
+function toggleHint(id) {
+  const el = document.getElementById('hint' + id);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleSolution(id) {
+  const el = document.getElementById('sol' + id);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// Handle tab key in textareas
+document.querySelectorAll('.challenge textarea').forEach(textarea => {
+  textarea.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      textarea.value = textarea.value.substring(0, start) + '    ' + textarea.value.substring(end);
+      textarea.selectionStart = textarea.selectionEnd = start + 4;
+    }
+  });
+});
+</script>
+</body>
+</html>
