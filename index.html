@@ -165,6 +165,7 @@ tr:hover td{background:var(--surface2)}
   <a href="#" data-section="php-core"><span class="tech-dot" style="background:var(--php)"></span>PHP 8 Deep Dive</a>
   <a href="#" data-section="php-oop"><span class="tech-dot" style="background:var(--php)"></span>OOP & Design Patterns</a>
   <a href="#" data-section="php-security"><span class="tech-dot" style="background:var(--php)"></span>Security & Performance</a>
+  <a href="#" data-section="php-internals"><span class="tech-dot" style="background:var(--php)"></span>Under the Hood</a>
 
   <div class="group-title">Laravel</div>
   <a href="#" data-section="laravel-core"><span class="tech-dot" style="background:var(--laravel)"></span>Service Container & Providers</a>
@@ -172,15 +173,18 @@ tr:hover td{background:var(--surface2)}
   <a href="#" data-section="laravel-advanced"><span class="tech-dot" style="background:var(--laravel)"></span>Queues, Events & Jobs</a>
   <a href="#" data-section="laravel-auth"><span class="tech-dot" style="background:var(--laravel)"></span>Auth, Policies & Gates</a>
   <a href="#" data-section="laravel-architecture"><span class="tech-dot" style="background:var(--laravel)"></span>Architecture & Patterns</a>
+  <a href="#" data-section="laravel-internals"><span class="tech-dot" style="background:var(--laravel)"></span>Under the Hood</a>
 
   <div class="group-title">React</div>
   <a href="#" data-section="react-core"><span class="tech-dot" style="background:var(--react)"></span>Hooks & State</a>
   <a href="#" data-section="react-advanced"><span class="tech-dot" style="background:var(--react)"></span>Advanced Patterns</a>
   <a href="#" data-section="react-perf"><span class="tech-dot" style="background:var(--react)"></span>Performance & Architecture</a>
+  <a href="#" data-section="react-internals"><span class="tech-dot" style="background:var(--react)"></span>Under the Hood</a>
 
   <div class="group-title">Vue</div>
   <a href="#" data-section="vue-core"><span class="tech-dot" style="background:var(--vue)"></span>Composition API & Reactivity</a>
   <a href="#" data-section="vue-advanced"><span class="tech-dot" style="background:var(--vue)"></span>Pinia, Router & SSR</a>
+  <a href="#" data-section="vue-internals"><span class="tech-dot" style="background:var(--vue)"></span>Under the Hood</a>
 
   <div class="group-title">System Design & DevOps</div>
   <a href="#" data-section="system-design"><span class="tech-dot" style="background:var(--cyan)"></span>System Design</a>
@@ -822,6 +826,292 @@ protected $except = ['stripe/webhook', 'api/*'];</code></pre>
     <tr><td>Use When</td><td>Database-agnostic code, most projects</td><td>MySQL-specific features needed</td></tr>
   </table>
   <div class="highlight-box info"><strong>Senior Answer:</strong> "I always use PDO through Laravel's database layer. The abstraction lets us switch between MySQL, PostgreSQL, and SQLite (for testing) without changing application code. Direct MySQLi is only justified when you need MySQL-specific features like async queries."</div>
+</section>
+
+<!-- ==================== PHP INTERNALS ==================== -->
+<section id="php-internals">
+  <h2><span class="tag tag-php">PHP</span> Under the Hood - How PHP Actually Works</h2>
+
+  <div class="highlight-box warning">
+    <strong>Why this matters:</strong> Senior interviewers at Lemon-level platforms will ask "How does PHP actually process a request?" or "Why is PHP single-threaded and how does it still handle thousands of requests?" If you can explain this, you immediately separate yourself from mid-level candidates.
+  </div>
+
+  <h3>PHP is Single-Threaded - But That's a Feature</h3>
+  <div class="card">
+    <p>PHP runs a <strong>share-nothing architecture</strong>. Each request gets its own isolated process with its own memory. When the request ends, everything is destroyed. No shared state, no race conditions, no mutex locks.</p>
+    <p>This is why PHP "scales horizontally" so easily - just add more workers. Each worker is independent.</p>
+    <pre><code>Request 1 ──> PHP Worker 1 (own memory, own variables, dies after response)
+Request 2 ──> PHP Worker 2 (completely isolated from Worker 1)
+Request 3 ──> PHP Worker 3 (no shared state between any workers)
+
+// This is fundamentally different from Node.js (single process, event loop)
+// or Java (threads sharing heap memory within one JVM)</code></pre>
+  </div>
+
+  <h3>The Full Request Lifecycle (What Actually Happens)</h3>
+  <pre><code>Browser sends HTTP request
+        |
+        v
+    ┌─────────┐
+    │  Nginx   │  Web server - handles static files, SSL, load balancing
+    │          │  Passes PHP requests to PHP-FPM via FastCGI protocol
+    └────┬─────┘
+         |  FastCGI (socket or TCP)
+         v
+    ┌──────────┐
+    │ PHP-FPM  │  Process Manager - maintains a POOL of PHP worker processes
+    │ (master) │  Decides: reuse idle worker, spawn new one, or queue request
+    └────┬─────┘
+         |
+         v
+    ┌──────────────┐
+    │ PHP Worker    │  One of the pool's child processes picks up the request
+    │              │
+    │  1. OPcache  │  Check if compiled bytecode is already cached
+    │     hit?     │  YES → skip to step 3
+    │              │
+    │  2. Zend     │  Lexing → Parsing → AST → Compile to bytecode (opcodes)
+    │     Engine   │  Store bytecode in OPcache for next request
+    │              │
+    │  3. Zend VM  │  Execute the bytecode (opcodes) instruction by instruction
+    │              │  (PHP 8: JIT can compile hot bytecode to machine code)
+    │              │
+    │  4. Laravel  │  Bootstrap → Route → Middleware → Controller → Response
+    │     App      │
+    │              │
+    │  5. Response  │ Send HTTP response back through Nginx to browser
+    │              │
+    │  6. Cleanup  │  ALL memory freed. All variables destroyed.
+    │              │  Worker returns to pool, ready for next request.
+    └──────────────┘</code></pre>
+
+  <h3>PHP-FPM (FastCGI Process Manager)</h3>
+  <div class="card">
+    <p>PHP-FPM is the <strong>process manager</strong> that sits between Nginx and PHP. It maintains a pool of ready-to-go PHP worker processes so you don't pay the cost of starting a new process for every request.</p>
+
+    <h4>Process Management Modes</h4>
+    <table>
+      <tr><th>Mode</th><th>How It Works</th><th>Use When</th></tr>
+      <tr><td><strong>static</strong></td><td>Fixed number of workers, always running</td><td>Predictable traffic, dedicated servers. Best performance, highest memory.</td></tr>
+      <tr><td><strong>dynamic</strong></td><td>Min idle workers kept warm, scales up to max on demand</td><td>Most common. Good balance of performance and memory.</td></tr>
+      <tr><td><strong>ondemand</strong></td><td>Workers only spawned when request arrives, killed after idle timeout</td><td>Low-traffic sites, shared hosting. Saves memory, slower first request.</td></tr>
+    </table>
+
+    <pre><code>; /etc/php/8.3/fpm/pool.d/www.conf
+[www]
+pm = dynamic
+pm.max_children = 50        ; Maximum worker processes
+pm.start_servers = 10       ; Workers started on FPM boot
+pm.min_spare_servers = 5    ; Keep at least 5 idle workers ready
+pm.max_spare_servers = 15   ; Don't keep more than 15 idle
+pm.max_requests = 500       ; Recycle worker after 500 requests (prevents memory leaks)
+pm.process_idle_timeout = 10s
+
+; SENIOR TIP: How to calculate max_children
+; max_children = Available RAM / Average RAM per worker
+; Example: 4GB available, each worker uses ~80MB
+; max_children = 4096 / 80 = ~50 workers
+; Monitor with: pm.status_path = /fpm-status</code></pre>
+  </div>
+
+  <h3>The Zend Engine (PHP's Core)</h3>
+  <div class="card">
+    <p>The Zend Engine is PHP's execution engine. It handles compilation and execution of PHP code.</p>
+
+    <h4>Compilation Pipeline</h4>
+    <pre><code>PHP Source Code
+    |
+    v
+┌─────────────┐
+│   Lexer      │  Tokenizes source code into tokens
+│  (Tokenizer) │  "<?php echo $x;" → [T_OPEN_TAG, T_ECHO, T_VARIABLE, ';']
+└──────┬───────┘
+       v
+┌─────────────┐
+│   Parser     │  Builds Abstract Syntax Tree (AST) from tokens
+│              │  Validates syntax - this is where "Parse error" comes from
+└──────┬───────┘
+       v
+┌─────────────┐
+│  Compiler    │  Converts AST into Zend opcodes (bytecode)
+│              │  Like assembly language for the Zend VM
+└──────┬───────┘
+       v
+┌─────────────┐
+│   Zend VM    │  Executes opcodes one by one
+│  (Executor)  │  This is where your PHP code actually RUNS
+└──────────────┘</code></pre>
+
+    <pre><code>// You can actually see the opcodes PHP generates:
+// php -d opcache.opt_debug_level=0x10000 -r 'echo 1 + 2;'
+
+// Opcodes for: echo 1 + 2;
+// L1    ECHO int(3)      ← compiler already computed 1+2 at compile time!
+// L1    RETURN int(1)
+
+// Opcodes for: echo $a + $b;
+// L1    ADD ~0, $a, $b   ← runtime addition needed
+// L1    ECHO ~0
+// L1    RETURN int(1)</code></pre>
+  </div>
+
+  <h3>OPcache - Why It's Critical</h3>
+  <div class="card">
+    <p><strong>Without OPcache:</strong> Every request re-reads PHP files from disk, re-lexes, re-parses, re-compiles to opcodes. For Laravel with ~500+ files autoloaded per request, this is extremely wasteful.</p>
+    <p><strong>With OPcache:</strong> Compiled opcodes are stored in shared memory. All workers read from the same cache. The lexer/parser/compiler step is completely skipped.</p>
+
+    <pre><code>; php.ini - OPcache configuration
+opcache.enable=1
+opcache.memory_consumption=256        ; MB of shared memory for opcodes
+opcache.interned_strings_buffer=16    ; MB for interned strings
+opcache.max_accelerated_files=20000   ; Max cached files (Laravel needs ~4000+)
+opcache.validate_timestamps=0         ; Production: DON'T check file changes (fastest)
+                                      ; Development: set to 1 (checks every revalidate_freq)
+opcache.revalidate_freq=0             ; Seconds between file change checks (if validate=1)
+
+; SENIOR: In production, set validate_timestamps=0
+; This means OPcache NEVER checks if files changed.
+; After deployment, you must reset OPcache:
+;   - php artisan opcache:clear (with a package)
+;   - Kill PHP-FPM workers: systemctl reload php8.3-fpm
+;   - Or use opcache_reset() in a deploy script</code></pre>
+
+    <h4>Preloading (PHP 7.4+)</h4>
+    <pre><code>; opcache.preload=/var/www/app/preload.php
+; opcache.preload_user=www-data
+
+// preload.php - loaded ONCE on FPM startup, stays in memory forever
+// Classes loaded here are available to ALL requests without autoloading
+require __DIR__ . '/vendor/autoload.php';
+
+// Preload frequently used Laravel classes
+$files = array_merge(
+    glob(__DIR__ . '/app/Models/*.php'),
+    glob(__DIR__ . '/app/Services/*.php'),
+);
+foreach ($files as $file) {
+    opcache_compile_file($file);
+}
+
+// TRADE-OFF: Faster runtime, but FPM must be restarted on code changes.
+// Best for production with stable code.</code></pre>
+  </div>
+
+  <h3>JIT Compiler (PHP 8.0+)</h3>
+  <div class="card">
+    <p>The JIT (Just-In-Time) compiler adds a layer ON TOP of OPcache. It takes frequently executed bytecode and compiles it directly to <strong>native machine code</strong> (x86/ARM assembly).</p>
+
+    <pre><code>Without JIT:  PHP source → opcodes → Zend VM interprets each opcode
+With JIT:     PHP source → opcodes → machine code → CPU executes directly
+
+; php.ini
+opcache.jit=1255              ; Enable JIT with tracing mode
+opcache.jit_buffer_size=128M  ; Memory for compiled machine code</code></pre>
+
+    <h4>When JIT Helps vs Doesn't Help</h4>
+    <table>
+      <tr><th>Helps (CPU-bound)</th><th>Doesn't Help (I/O-bound)</th></tr>
+      <tr><td>Math calculations, image processing</td><td>Database queries (waiting for DB response)</td></tr>
+      <tr><td>Data transformation, loops</td><td>HTTP API calls (waiting for network)</td></tr>
+      <tr><td>Template rendering</td><td>File reads/writes (waiting for disk)</td></tr>
+      <tr><td>Cryptography, hashing</td><td>Most typical Laravel web apps</td></tr>
+    </table>
+    <p><strong>Senior insight:</strong> Most Laravel apps are I/O-bound (waiting for database, Redis, external APIs). JIT gives maybe 5-10% improvement. OPcache alone gives 3-5x improvement. Focus on OPcache first, JIT is a bonus.</p>
+  </div>
+
+  <h3>How Laravel Boots (The Request Lifecycle)</h3>
+  <pre><code>// public/index.php - EVERY request starts here
+
+// 1. Composer autoloader (already opcached)
+require __DIR__.'/../vendor/autoload.php';
+
+// 2. Create the Application (Service Container)
+$app = require_once __DIR__.'/../bootstrap/app.php';
+// This creates the IoC container and registers base service providers
+
+// 3. Create the HTTP Kernel
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+// 4. Handle the request through middleware pipeline
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+);
+
+// INSIDE kernel->handle():
+//   a) Bootstrap the application:
+//      - Load .env file
+//      - Load config files
+//      - Register exception handler
+//      - Register facades
+//      - Register service providers (register() on ALL, then boot() on ALL)
+//
+//   b) Send request through global middleware stack:
+//      TrustProxies → PreventRequestsDuringMaintenance →
+//      ValidatePostSize → TrimStrings → ConvertEmptyStringsToNull
+//
+//   c) Router matches URL to route definition
+//
+//   d) Route middleware runs (auth, throttle, etc.)
+//
+//   e) Controller method executes
+//
+//   f) Response object built and returned
+
+// 5. Send response to browser
+$response->send();
+
+// 6. Run terminable middleware (logging, session save)
+$kernel->terminate($request, $response);
+
+// 7. PHP-FPM worker cleans up ALL memory, returns to pool</code></pre>
+
+  <h3>Laravel Octane - Breaking the Share-Nothing Rule</h3>
+  <div class="card">
+    <p>Laravel Octane (with Swoole or FrankenPHP) keeps the Laravel application bootstrapped in memory across requests. Instead of booting Laravel fresh on every request:</p>
+    <pre><code>Traditional PHP-FPM:
+  Request 1: Boot Laravel (100ms) → Handle (50ms) → Destroy
+  Request 2: Boot Laravel (100ms) → Handle (50ms) → Destroy
+  Request 3: Boot Laravel (100ms) → Handle (50ms) → Destroy
+
+Laravel Octane:
+  Boot Laravel ONCE (100ms)
+  Request 1: Handle (50ms) → Reset request state
+  Request 2: Handle (50ms) → Reset request state
+  Request 3: Handle (50ms) → Reset request state</code></pre>
+    <p><strong>Gotcha:</strong> Since the app stays in memory, you must be careful with static properties and singletons - they persist across requests. Use <code>$this->app->scoped()</code> instead of <code>singleton()</code> for request-scoped services.</p>
+  </div>
+
+  <h3>Complete Mental Model</h3>
+  <pre><code>┌──────────────────────────────────────────────────────────┐
+│                    PRODUCTION STACK                       │
+│                                                          │
+│  Client ──→ CDN (static assets)                          │
+│         ──→ Nginx (reverse proxy, SSL, load balance)     │
+│               │                                          │
+│               ▼                                          │
+│           PHP-FPM (process pool: 20-50 workers)          │
+│               │                                          │
+│               ▼                                          │
+│           ┌─────────────────────────────────────┐        │
+│           │  OPcache (shared memory)             │        │
+│           │  - Compiled bytecode for all files   │        │
+│           │  - Preloaded classes                 │        │
+│           │  - JIT-compiled hot paths            │        │
+│           └─────────────────────────────────────┘        │
+│               │                                          │
+│               ▼                                          │
+│           Zend VM executes opcodes                       │
+│           Laravel handles request                        │
+│               │                                          │
+│               ▼                                          │
+│           ┌─────────┐  ┌───────┐  ┌──────┐             │
+│           │ MySQL/   │  │ Redis │  │  S3  │             │
+│           │ Postgres │  │       │  │      │             │
+│           └─────────┘  └───────┘  └──────┘             │
+│               │                                          │
+│           Queue Workers (separate PHP processes)         │
+│           Scheduler (cron → artisan schedule:run)        │
+└──────────────────────────────────────────────────────────┘</code></pre>
 </section>
 
 <!-- ==================== LARAVEL CORE ==================== -->
@@ -1715,6 +2005,209 @@ class CreateOrderActionTest extends TestCase
 }</code></pre>
 </section>
 
+<!-- ==================== LARAVEL INTERNALS ==================== -->
+<section id="laravel-internals">
+  <h2><span class="tag tag-laravel">Laravel</span> Under the Hood - Request Pipeline Internals</h2>
+
+  <h3>The Middleware Pipeline - How It Actually Works</h3>
+  <div class="card">
+    <p>Laravel's middleware is the <strong>Chain of Responsibility</strong> pattern implemented via nested closures. Each middleware wraps the next one like Russian nesting dolls:</p>
+    <pre><code>// What it LOOKS like:
+$response = $middleware1->handle($request, function ($request) {
+    return $middleware2->handle($request, function ($request) {
+        return $middleware3->handle($request, function ($request) {
+            return $controller->action($request);
+        });
+    });
+});
+
+// The Pipeline class builds this automatically:
+// Illuminate\Pipeline\Pipeline
+
+return (new Pipeline($this->app))
+    ->send($request)
+    ->through($this->middleware)    // Array of middleware classes
+    ->then(function ($request) {    // The final destination
+        return $this->router->dispatch($request);
+    });</code></pre>
+
+    <pre><code>  REQUEST enters
+      │
+      ▼
+┌─────────────────┐
+│  Middleware 1    │
+│  (before logic)  │──┐
+│                  │  │
+│  $next($request) │  │  Calls next middleware
+│                  │  │
+│  (after logic)   │◄─┘  Runs AFTER response comes back up
+└─────────────────┘
+      │
+      ▼
+┌─────────────────┐
+│  Middleware 2    │
+│  (before logic)  │──┐
+│                  │  │
+│  $next($request) │  │
+│                  │  │
+│  (after logic)   │◄─┘
+└─────────────────┘
+      │
+      ▼
+┌─────────────────┐
+│   Controller     │
+│                  │  Generates Response
+│   return $resp;  │
+└─────────────────┘
+      │
+      ▼
+  RESPONSE travels back UP through each middleware's "after" logic</code></pre>
+  </div>
+
+  <h3>Service Container Resolution - How DI Actually Works</h3>
+  <div class="card">
+    <pre><code>// When you type-hint in a constructor:
+class OrderController {
+    public function __construct(private OrderRepository $repo) {}
+}
+
+// Laravel's container does this behind the scenes:
+
+// 1. Router determines OrderController handles this route
+// 2. Container is asked to build OrderController
+// 3. Container reads the constructor via PHP Reflection:
+//    ReflectionClass::getConstructor()->getParameters()
+// 4. Finds parameter: OrderRepository $repo
+// 5. Checks bindings: is OrderRepository bound to a concrete class?
+//    YES → build the concrete class (recursively resolving ITS dependencies)
+//    NO  → is OrderRepository a concrete class itself?
+//      YES → auto-resolve it (read ITS constructor, resolve ITS deps...)
+//      NO  → throw BindingResolutionException
+// 6. Inject resolved instance into OrderController constructor
+// 7. Return fully constructed OrderController
+
+// This is RECURSIVE - dependencies of dependencies are resolved automatically
+// Container → OrderController needs OrderRepository
+//          → OrderRepository needs DatabaseManager
+//          → DatabaseManager needs Config
+//          → Config already resolved (singleton) ✓
+//          → DatabaseManager built ✓
+//          → OrderRepository built ✓
+//          → OrderController built ✓</code></pre>
+  </div>
+
+  <h3>Eloquent Under the Hood</h3>
+  <div class="card">
+    <h4>How Query Building Works</h4>
+    <pre><code>// This fluent chain:
+User::where('active', true)->where('age', '>', 18)->orderBy('name')->get();
+
+// Internally builds:
+// 1. User:: calls __callStatic → forwards to new Builder instance
+// 2. Each ->where() adds to $builder->wheres[] array:
+//    [
+//      ['type' => 'Basic', 'column' => 'active', 'operator' => '=', 'value' => true],
+//      ['type' => 'Basic', 'column' => 'age', 'operator' => '>', 'value' => 18],
+//    ]
+// 3. ->orderBy() adds to $builder->orders[]
+// 4. ->get() triggers:
+//    a) Grammar compiles arrays into SQL: "SELECT * FROM users WHERE active = ? AND age > ? ORDER BY name ASC"
+//    b) Connection sends to PDO with bindings [true, 18]
+//    c) PDO sends to database
+//    d) Results come back as arrays
+//    e) Eloquent hydrates each row into a User model instance
+//    f) Returns a Collection of User models</code></pre>
+
+    <h4>How Relationships Lazy-Load</h4>
+    <pre><code>$user = User::find(1);
+$posts = $user->posts;  // How does this work?
+
+// 1. $user->posts triggers __get() magic method
+// 2. __get() checks: is 'posts' a defined relationship method?
+// 3. YES → calls $this->posts() which returns a HasMany relation object
+// 4. HasMany relation automatically adds WHERE user_id = 1
+// 5. Executes query, caches result on the model
+// 6. Next access to $user->posts returns cached result (no query)
+
+// This is why lazy loading causes N+1:
+// Each $user->posts in a loop triggers step 3-5 SEPARATELY
+// Eager loading with ->with('posts') does ONE query for ALL users' posts</code></pre>
+  </div>
+
+  <h3>Facade Pattern - How Facades Work</h3>
+  <div class="card">
+    <pre><code>// When you write:
+Cache::get('key');
+
+// What ACTUALLY happens:
+
+// 1. Cache is not a real class - it's Illuminate\Support\Facades\Cache
+// 2. This class extends Facade and defines:
+//    protected static function getFacadeAccessor() { return 'cache'; }
+//
+// 3. Cache::get() triggers __callStatic('get', ['key'])
+// 4. Facade base class resolves 'cache' from the Service Container:
+//    $instance = app('cache');  // Returns CacheManager singleton
+// 5. Calls $instance->get('key') on the real object
+//
+// So facades are just STATIC PROXIES to objects in the container.
+// They're syntactic sugar, not actual static methods.
+//
+// SENIOR: This is why facades are testable:
+Cache::shouldReceive('get')->with('key')->andReturn('value');
+// Swaps the container binding with a Mockery mock</code></pre>
+
+    <pre><code>  Your Code             Facade             Container          Real Object
+  ─────────            ───────             ─────────          ───────────
+  Cache::get('key')
+       │
+       ▼
+  __callStatic('get')
+       │
+       ▼
+  getFacadeAccessor()
+  returns 'cache'
+       │                                       │
+       ▼                                       ▼
+  app('cache')  ────────────────────►  resolve('cache')
+                                               │
+                                               ▼
+                                       CacheManager
+                                       (singleton)
+                                               │
+                                               ▼
+                                       $manager->get('key')
+                                               │
+                                               ▼
+                                       Redis/Memcached/File
+                                       returns value</code></pre>
+  </div>
+
+  <h3>How Laravel Events Are Dispatched</h3>
+  <div class="card">
+    <pre><code>event(new OrderPlaced($order));
+
+// Under the hood:
+// 1. event() helper calls app('events')->dispatch(new OrderPlaced($order))
+// 2. Dispatcher looks up registered listeners for OrderPlaced::class
+//    (registered in EventServiceProvider or via Event::listen)
+// 3. For each listener:
+//    a) If listener implements ShouldQueue:
+//       → Serialize the event
+//       → Push a job onto the queue (Redis/SQS/database)
+//       → Queue worker later deserializes and calls listener->handle()
+//    b) If listener is synchronous:
+//       → Resolve listener from container (DI works here too)
+//       → Call listener->handle($event) immediately
+// 4. Returns after all sync listeners finish
+//    (queued listeners execute independently later)
+
+// This is why Events + Queues are powerful:
+// event(new OrderPlaced($order)) returns IMMEDIATELY
+// Email sending, inventory update, analytics happen ASYNCHRONOUSLY</code></pre>
+  </div>
+</section>
+
 <!-- ==================== REACT CORE ==================== -->
 <section id="react-core">
   <h2><span class="tag tag-react">React</span> Hooks & State Management</h2>
@@ -2299,6 +2792,200 @@ function NavLink({ to, children }) {
   </div>
 </section>
 
+<!-- ==================== REACT INTERNALS ==================== -->
+<section id="react-internals">
+  <h2><span class="tag tag-react">React</span> Under the Hood - How React Actually Works</h2>
+
+  <h3>The Rendering Pipeline (Step by Step)</h3>
+  <div class="card">
+    <pre><code>  setState() or prop change
+          │
+          ▼
+  ┌───────────────────┐
+  │   TRIGGER PHASE    │   React schedules a re-render
+  │                    │   (batched with other state updates in React 18)
+  └────────┬──────────┘
+           │
+           ▼
+  ┌───────────────────┐
+  │   RENDER PHASE     │   React calls your component function
+  │   (Pure, no side   │   Returns React Elements (virtual DOM nodes)
+  │    effects!)       │   This is a DESCRIPTION of UI, not actual DOM
+  │                    │
+  │   function App() { │   React elements are plain JS objects:
+  │     return (       │   { type: 'div', props: { children: [...] } }
+  │       <div>...</div>│
+  │     );             │   Can be paused, aborted, restarted (Fiber!)
+  │   }                │
+  └────────┬──────────┘
+           │
+           ▼
+  ┌───────────────────┐
+  │  RECONCILIATION    │   Diff new virtual DOM vs previous virtual DOM
+  │  (Diffing)         │
+  │                    │   Rules:
+  │  Old:  &lt;div&gt;      │   1. Different type? → tear down old, build new
+  │  New:  &lt;div&gt;      │   2. Same type? → update changed attributes only
+  │  → Same! Update    │   3. Lists? → use 'key' to match elements
+  │    only changed    │
+  │    attributes      │   O(n) heuristic, not O(n³) tree diff
+  └────────┬──────────┘
+           │
+           ▼
+  ┌───────────────────┐
+  │   COMMIT PHASE     │   Apply minimal DOM mutations
+  │   (Side effects)   │   - Insert/update/delete actual DOM nodes
+  │                    │   - Run useLayoutEffect (synchronous, before paint)
+  │                    │   - Browser paints the screen
+  │                    │   - Run useEffect (asynchronous, after paint)
+  └───────────────────┘</code></pre>
+  </div>
+
+  <h3>React Fiber Architecture - Why It Exists</h3>
+  <div class="card">
+    <p><strong>Problem (React 15 and earlier):</strong> Reconciliation was synchronous and recursive. A large component tree (e.g., 10,000 list items) would block the main thread for hundreds of milliseconds. The browser couldn't respond to user input, animations would stutter.</p>
+
+    <p><strong>Solution (React 16+ Fiber):</strong> Rewrite reconciliation as an iterative, interruptible process using a linked list data structure called "Fiber."</p>
+
+    <pre><code>// A Fiber node (simplified) - one per component/element
+{
+  type: UserProfile,           // Component function or HTML tag
+  key: 'user-42',
+  props: { userId: 42 },
+  stateNode: DOM element,      // Actual DOM node (for host components)
+
+  // Tree structure (linked list, not recursive tree)
+  return: parentFiber,         // ← parent
+  child: firstChildFiber,     // ← first child
+  sibling: nextSiblingFiber,  // ← next sibling
+
+  // Work tracking
+  pendingProps: {},
+  memoizedState: {},           // Hook states stored here
+  effectTag: 'UPDATE',        // What DOM change is needed
+  alternate: previousFiber,   // Points to current/work-in-progress pair
+}</code></pre>
+
+    <h4>How Fiber enables interruptible rendering:</h4>
+    <pre><code>  ┌──────────────────────────────────────────────────┐
+  │              MAIN THREAD TIMELINE                 │
+  │                                                    │
+  │  React 15 (synchronous):                          │
+  │  ┃━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┃       │
+  │  ┃  Render entire tree (300ms, BLOCKING)  ┃       │
+  │  ┃  User can't type, scroll, or click     ┃       │
+  │                                                    │
+  │  React 16+ (Fiber):                               │
+  │  ┃━━━━━┃  ┃━━━━━┃  ┃━━━━━┃  ┃━━━━━┃              │
+  │  ┃chunk┃→┃input┃→┃chunk┃→┃paint┃→┃chunk┃          │
+  │  ┃ 5ms ┃  ┃event┃  ┃ 5ms ┃  ┃frame┃  ┃ 5ms ┃    │
+  │                                                    │
+  │  Work is split into ~5ms chunks                   │
+  │  Between chunks, browser can handle user input    │
+  │  Result: smooth 60fps even during large renders   │
+  └──────────────────────────────────────────────────┘</code></pre>
+
+    <h4>Priority Levels (Lanes in React 18):</h4>
+    <table>
+      <tr><th>Priority</th><th>Example</th><th>Behavior</th></tr>
+      <tr><td>Immediate (Sync)</td><td>Text input, click handler</td><td>Cannot be interrupted, runs synchronously</td></tr>
+      <tr><td>User-blocking</td><td>Hover, drag interactions</td><td>High priority, processes quickly</td></tr>
+      <tr><td>Normal</td><td>Data fetch result rendering</td><td>Can be interrupted by higher priority</td></tr>
+      <tr><td>Low</td><td>Off-screen content, analytics</td><td>Processed when idle</td></tr>
+      <tr><td>Idle</td><td>Prefetching, prerendering</td><td>Only when nothing else to do</td></tr>
+    </table>
+  </div>
+
+  <h3>How Hooks Work Internally</h3>
+  <div class="card">
+    <pre><code>// Hooks are stored as a LINKED LIST on the Fiber node
+// This is why hooks must be called in the same order every render!
+
+// When your component renders:
+function Counter() {
+  const [count, setCount] = useState(0);    // Hook 1
+  const [name, setName] = useState('');      // Hook 2
+  useEffect(() => { ... }, [count]);         // Hook 3
+  return ...;
+}
+
+// Fiber's memoizedState linked list:
+// Hook 1 (useState) → Hook 2 (useState) → Hook 3 (useEffect)
+//   { memoizedState: 0,   next: ──→ }
+//   { memoizedState: '',  next: ──→ }
+//   { memoizedState: {effect}, next: null }
+
+// On re-render, React walks this list in order:
+// 1st useState call → reads Hook 1 → returns [0, setter]
+// 2nd useState call → reads Hook 2 → returns ['', setter]
+// 3rd useEffect call → reads Hook 3 → compares deps
+
+// THIS IS WHY:
+// ❌ if (condition) { useState(0) }  ← breaks the order!
+// ❌ Inside loops                    ← unpredictable order!
+// ✅ Always at top level of component, same order every render</code></pre>
+  </div>
+
+  <h3>Virtual DOM vs Direct DOM</h3>
+  <div class="card">
+    <pre><code>// Direct DOM manipulation:
+element.style.color = 'red';     // Triggers style recalculation
+element.style.fontSize = '16px'; // Triggers layout
+element.style.margin = '10px';   // Triggers layout AGAIN
+// Each change may trigger: Style → Layout → Paint → Composite
+// 3 changes = potentially 3 layout passes (expensive!)
+
+// React's Virtual DOM approach:
+// 1. Batch all changes in memory (virtual DOM diff)
+// 2. Calculate the MINIMAL set of actual DOM operations
+// 3. Apply them in ONE batch
+// Result: 3 changes = 1 layout pass
+
+// SENIOR NUANCE: Virtual DOM is NOT faster than hand-optimized DOM.
+// It's faster than NAIVE DOM manipulation.
+// The real value is DEVELOPER EXPERIENCE:
+// - Declarative code (describe WHAT, not HOW)
+// - Automatic batching
+// - Consistent mental model
+// Frameworks like Svelte/Solid prove you CAN be fast without vDOM.</code></pre>
+  </div>
+
+  <h3>React Concurrent Features</h3>
+  <div class="card">
+    <pre><code>// useTransition - mark updates as non-urgent
+function SearchResults() {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [isPending, startTransition] = useTransition();
+
+  function handleChange(e) {
+    setQuery(e.target.value);           // URGENT: update input immediately
+    startTransition(() => {
+      setResults(filterData(e.target.value)); // NON-URGENT: can be interrupted
+    });
+  }
+
+  return (
+    &lt;&gt;
+      &lt;input value={query} onChange={handleChange} /&gt;
+      {isPending ? &lt;Spinner /&gt; : &lt;ResultList data={results} /&gt;}
+    &lt;/&gt;
+  );
+}
+
+// Suspense - declarative loading states
+&lt;Suspense fallback={&lt;Skeleton /&gt;}&gt;
+  &lt;UserProfile /&gt;   {/* Suspends while data loads */}
+&lt;/Suspense&gt;
+
+// How Suspense works internally:
+// 1. Component throws a Promise (yes, literally throws)
+// 2. Nearest Suspense boundary catches it
+// 3. Shows fallback while Promise is pending
+// 4. When Promise resolves, React retries rendering the component</code></pre>
+  </div>
+</section>
+
 <!-- ==================== VUE CORE ==================== -->
 <section id="vue-core">
   <h2><span class="tag tag-vue">Vue 3</span> Composition API & Reactivity</h2>
@@ -2703,6 +3390,234 @@ function goToUser(id) {
       <li>App becomes fully interactive (Time to Interactive)</li>
     </ol>
     <p><strong>Hydration mismatch:</strong> When server HTML doesn't match what Vue would render on client. Common causes: browser-only APIs (<code>window</code>, <code>localStorage</code>), date/time formatting, random values. Fix with <code>&lt;ClientOnly&gt;</code> wrapper or <code>onMounted</code> for client-only logic.</p>
+  </div>
+</section>
+
+<!-- ==================== VUE INTERNALS ==================== -->
+<section id="vue-internals">
+  <h2><span class="tag tag-vue">Vue 3</span> Under the Hood - How Vue's Reactivity Works</h2>
+
+  <h3>Proxy-Based Reactivity System</h3>
+  <div class="card">
+    <p>Vue 3's reactivity is built on JavaScript <strong>Proxy</strong> (replacing Vue 2's <code>Object.defineProperty</code>). Understanding this is key to understanding why Vue behaves the way it does.</p>
+
+    <pre><code>// What reactive() actually does (simplified):
+function reactive(target) {
+  return new Proxy(target, {
+    get(target, key, receiver) {
+      track(target, key);          // Register this property as a dependency
+      const result = Reflect.get(target, key, receiver);
+      if (isObject(result)) {
+        return reactive(result);   // Deep reactivity - nested objects are also proxied
+      }
+      return result;
+    },
+    set(target, key, value, receiver) {
+      const oldValue = target[key];
+      const result = Reflect.set(target, key, value, receiver);
+      if (oldValue !== value) {
+        trigger(target, key);      // Notify all watchers of this property
+      }
+      return result;
+    },
+    deleteProperty(target, key) {
+      const result = Reflect.deleteProperty(target, key);
+      trigger(target, key);        // Vue 3 CAN detect property deletion!
+      return result;               // (Vue 2 couldn't - needed Vue.delete())
+    }
+  });
+}</code></pre>
+
+    <h4>Dependency Tracking (track + trigger)</h4>
+    <pre><code>  Component renders → accesses state.user.name
+          │
+          ▼
+      Proxy GET trap fires
+          │
+          ▼
+      track(state, 'user')
+          │
+          ▼
+  ┌─────────────────────────────────────────┐
+  │  Dependency Map (WeakMap)               │
+  │                                         │
+  │  state ──→ { 'user' → Set([effect1]),   │   effect1 = this component's
+  │              'posts' → Set([effect2]) }  │   render function
+  │                                         │
+  └─────────────────────────────────────────┘
+
+  Later: state.user = newUser
+          │
+          ▼
+      Proxy SET trap fires
+          │
+          ▼
+      trigger(state, 'user')
+          │
+          ▼
+      Look up Set([effect1]) → run effect1
+          │
+          ▼
+      Component re-renders</code></pre>
+  </div>
+
+  <h3>ref() vs reactive() - What Happens Internally</h3>
+  <div class="card">
+    <pre><code>// ref(0) creates:
+{
+  __v_isRef: true,
+  _value: 0,           // Actual value stored here
+  get value() {
+    track(this, 'value');    // Dependency tracking on access
+    return this._value;
+  },
+  set value(newVal) {
+    if (newVal !== this._value) {
+      this._value = newVal;
+      trigger(this, 'value'); // Trigger watchers on change
+    }
+  }
+}
+
+// reactive({ name: 'John' }) creates:
+// A Proxy wrapping the object (see above)
+// No .value needed because the Proxy intercepts ALL property access
+
+// WHY ref needs .value:
+// JavaScript can't intercept reassignment of a primitive:
+//   let x = 5;
+//   x = 10;  ← NO way to "trap" this with Proxy
+//
+// So ref() wraps it in an object:
+//   ref.value = 10;  ← Proxy CAN trap this via set()
+//
+// In templates, Vue auto-unwraps refs:
+//   {{ count }} not {{ count.value }} ← compiler handles this</code></pre>
+  </div>
+
+  <h3>Vue 3 Compiler - Template to Render Function</h3>
+  <div class="card">
+    <p>Vue templates are <strong>compiled to JavaScript render functions</strong>. This happens at build time (with Vite/Webpack) or at runtime (if using the full build).</p>
+
+    <pre><code>&lt;!-- Your template: --&gt;
+&lt;template&gt;
+  &lt;div class="user"&gt;
+    &lt;h1&gt;{{ user.name }}&lt;/h1&gt;
+    &lt;p v-if="user.active"&gt;Active&lt;/p&gt;
+    &lt;ul&gt;
+      &lt;li v-for="post in posts" :key="post.id"&gt;{{ post.title }}&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+// Compiled to (simplified):
+function render(_ctx) {
+  return h('div', { class: 'user' }, [
+    h('h1', null, _ctx.user.name),
+    _ctx.user.active
+      ? h('p', null, 'Active')
+      : null,                          // v-if → ternary
+    h('ul', null,
+      _ctx.posts.map(post =>           // v-for → .map()
+        h('li', { key: post.id }, post.title)
+      )
+    )
+  ]);
+}</code></pre>
+
+    <h4>Vue 3 Compiler Optimizations</h4>
+    <pre><code>// 1. STATIC HOISTING - static nodes are created ONCE, reused every render
+const _hoisted_1 = h('p', null, 'This text never changes');
+
+function render(_ctx) {
+  return h('div', null, [
+    _hoisted_1,                    // Reused, not recreated
+    h('p', null, _ctx.dynamicText) // Only this is re-evaluated
+  ]);
+}
+
+// 2. PATCH FLAGS - tell the differ EXACTLY what can change
+h('div', { id: _ctx.id, class: 'static' }, _ctx.text, PatchFlags.TEXT | PatchFlags.PROPS, ['id'])
+//                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+// "Only text content and 'id' prop can change - skip checking everything else"
+
+// 3. BLOCK TREE - skip static subtrees entirely during diffing
+// Vue tracks "dynamic children" in blocks
+// A component with 100 static elements and 3 dynamic ones
+// → diff only checks the 3 dynamic ones
+
+// 4. CACHE EVENT HANDLERS
+// @click="handleClick" → compiled with inline cache
+// Prevents child re-renders caused by new function references
+// (React needs useCallback for this - Vue does it automatically)</code></pre>
+  </div>
+
+  <h3>Vue vs React Reactivity Models</h3>
+  <div class="card">
+    <table>
+      <tr><th>Aspect</th><th>Vue 3</th><th>React</th></tr>
+      <tr><td>Change detection</td><td>Automatic via Proxy traps</td><td>Manual via setState/dispatch</td></tr>
+      <tr><td>Granularity</td><td>Property-level (only components using changed property re-render)</td><td>Component-level (entire component + children re-render)</td></tr>
+      <tr><td>Re-render prevention</td><td>Automatic (only affected components)</td><td>Manual (React.memo, useMemo, useCallback)</td></tr>
+      <tr><td>Template compilation</td><td>Compiled with optimizations (patch flags, static hoisting)</td><td>JSX compiled to h() calls, no static analysis</td></tr>
+      <tr><td>Mental model</td><td>Mutable state, framework tracks changes</td><td>Immutable state, you tell framework what changed</td></tr>
+    </table>
+
+    <pre><code>// Vue: Change a property → Vue knows EXACTLY which components need updating
+state.user.name = 'Jane';
+// Only components that accessed state.user.name re-render
+
+// React: Call setState → component AND all children re-render
+setState({ ...state, user: { ...state.user, name: 'Jane' } });
+// Must use React.memo + useMemo to prevent unnecessary child re-renders
+
+// SENIOR INSIGHT: Neither approach is "better" - they have different trade-offs
+// Vue: Less boilerplate, automatic optimization, but "magic" can be surprising
+// React: More explicit, more control, but requires manual optimization work</code></pre>
+  </div>
+
+  <h3>Virtual DOM in Vue vs React</h3>
+  <div class="card">
+    <p>Both use a Virtual DOM, but Vue's is <strong>compiler-informed</strong> while React's is <strong>runtime-only</strong>.</p>
+    <pre><code>  ┌────────────────────────────────────────────────┐
+  │                   VUE 3                         │
+  │                                                  │
+  │   Template ──→ Compiler ──→ Optimized Render Fn │
+  │                    │                             │
+  │                    ▼                             │
+  │           Patch Flags added                     │
+  │           Static trees hoisted                  │
+  │           Block tree created                    │
+  │                    │                             │
+  │                    ▼                             │
+  │           Virtual DOM Diff                      │
+  │           (skips static nodes,                  │
+  │            only checks flagged props)            │
+  │                    │                             │
+  │                    ▼                             │
+  │           Minimal DOM updates                   │
+  └────────────────────────────────────────────────┘
+
+  ┌────────────────────────────────────────────────┐
+  │                   REACT                         │
+  │                                                  │
+  │   JSX ──→ Babel/SWC ──→ h() calls (no hints)   │
+  │                    │                             │
+  │                    ▼                             │
+  │           Virtual DOM created                   │
+  │           (no compile-time optimization)         │
+  │                    │                             │
+  │                    ▼                             │
+  │           Full tree diff (Fiber)                │
+  │           (must check every node)                │
+  │           (BUT: interruptible + prioritized)     │
+  │                    │                             │
+  │                    ▼                             │
+  │           DOM updates                           │
+  └────────────────────────────────────────────────┘
+
+  Vue: Smarter diffing (knows what CAN change)
+  React: Smarter scheduling (knows what SHOULD update first)</code></pre>
   </div>
 </section>
 
