@@ -919,28 +919,39 @@ pm.process_idle_timeout = 10s
     <p>The Zend Engine is PHP's execution engine. It handles compilation and execution of PHP code.</p>
 
     <h4>Compilation Pipeline</h4>
-    <pre><code>PHP Source Code
-    |
-    v
-┌─────────────┐
-│   Lexer      │  Tokenizes source code into tokens
-│  (Tokenizer) │  "<?php echo $x;" → [T_OPEN_TAG, T_ECHO, T_VARIABLE, ';']
-└──────┬───────┘
-       v
-┌─────────────┐
-│   Parser     │  Builds Abstract Syntax Tree (AST) from tokens
-│              │  Validates syntax - this is where "Parse error" comes from
-└──────┬───────┘
-       v
-┌─────────────┐
-│  Compiler    │  Converts AST into Zend opcodes (bytecode)
-│              │  Like assembly language for the Zend VM
-└──────┬───────┘
-       v
-┌─────────────┐
-│   Zend VM    │  Executes opcodes one by one
-│  (Executor)  │  This is where your PHP code actually RUNS
-└──────────────┘</code></pre>
+    <pre><code>              PHP Source Code
+                     |
+                     v
+      +--------------------------+
+      |   1. LEXER (Tokenizer)   |
+      +--------------------------+
+         Source code -> tokens
+         "&lt;?php echo $x;" becomes:
+         [T_OPEN_TAG, T_ECHO, T_VARIABLE, ';']
+                     |
+                     v
+      +--------------------------+
+      |        2. PARSER         |
+      +--------------------------+
+         Tokens -> Abstract Syntax Tree
+         Validates syntax
+         ("Parse error" originates here)
+                     |
+                     v
+      +--------------------------+
+      |       3. COMPILER        |
+      +--------------------------+
+         AST -> Zend opcodes (bytecode)
+         Like assembly for the Zend VM
+         Constant folding happens here
+                     |
+                     v
+      +--------------------------+
+      |   4. ZEND VM (Executor)  |
+      +--------------------------+
+         Executes opcodes one by one
+         This is where your code actually RUNS
+         JIT may compile hot paths (PHP 8+)</code></pre>
 
     <pre><code>// You can actually see the opcodes PHP generates:
 // php -d opcache.opt_debug_level=0x10000 -r 'echo 1 + 2;'
